@@ -89,6 +89,8 @@ class ZeroMQSubscriber():
             for listItem in self.subscriberList:
                 if listItem in socks:
                     topic, pubAddress, contents = listItem.recv_multipart()
-                    responseList.append({'topic': topic.decode(), 'pubAddress': pubAddress.decode(), 'contents': json.loads(contents.decode())})
+                    responseList.append({'topic': topic.decode(), 
+                        'pubAddress': pubAddress.decode(), 
+                        'contents': json.loads(contents.decode())})
 
         return responseList
