@@ -20,6 +20,13 @@ class ProcessManager():
         """
         self.processHandleList = []
 
+    def getProcessList(self):
+        """
+        Gets current list.  Mainly used for testing.
+        :returns: list
+        """ 
+        return self.processHandleList
+
     def addProcess(self, inProcessDict):
         """
         Add process executable to managed list
