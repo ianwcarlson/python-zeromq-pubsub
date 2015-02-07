@@ -19,11 +19,19 @@ class ProcessManager():
         Constructor.  Initializes class variables.
         """
         self.processHandleList = []
+        self.processInputList = []
 
     def getProcessList(self):
         """
-        Gets current list.  Mainly used for testing.
+        Gets current list.  Mainly used for testing to check accessor.
         :returns: list
+        """ 
+        return self.processInputList
+
+    def getProcessStatusList(self):
+        """
+        Gets process status list. Need to further refine this to be more useful.
+        :returns: list of type subprocess.Popen
         """ 
         return self.processHandleList
 
@@ -38,7 +46,7 @@ class ProcessManager():
         :raises ValueError
         """
         if ('processName' in inProcessDict and 'endPoint' in inProcessDict):
-            self.processHandleList.append(inProcessDict)
+            self.processInputList.append(inProcessDict)
         else:
             raise ValueError("'processName' or 'endPoint' keys don't exist in input dictionary")
         
@@ -52,10 +60,10 @@ class ProcessManager():
 
         """
         # start processes
-        for idx in range(len(self.processHandleList)):
-            path = os.path.join(scriptDir,self.processHandleList[idx]['processName'])
-            print ('opening process: ' + str(path))
-            processHandleList.append(subprocess.Popen(['python3', path], stdout=True))
+        for idx in range(len(self.processInputList)):
+            path = os.path.join(scriptDir,self.processInputList[idx]['processName'])
+            print ('Starting process: ' + str(path))
+            self.processHandleList.append(subprocess.Popen(['python3', path], stdout=True))
 
         # monitor processes to see if they're still aliveps
         while(True):
@@ -64,9 +72,9 @@ class ProcessManager():
 
             for idx in range(len(self.processHandleList)):
                 if (self.processHandleList[idx].poll() != None):
-                    print('process done')
+                    print('Process done')
                     # only pop one at a time because doing so screws up indexing
                     self.processHandleList.pop(idx)
                     break
 
-            time.sleep(0.1)
+            time.sleep(0.01)
