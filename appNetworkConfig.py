@@ -4,7 +4,7 @@
 """
 
 
-#K9_HW_IF_ENDPOINT_ADDR = 'tcp://127.0.0.1:5556'
+K9_HW_IF_ENDPOINT_ADDR = 'tcp://127.0.0.1:5556'
 #SQLITE_DB_ENDPOINT_ADDR = 'tcp://127.0.0.1:5557'
 
 #processList = [

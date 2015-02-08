@@ -9,6 +9,7 @@ scriptDir=os.path.dirname(os.path.realpath(__file__))
 
 
 PUB_ENDPOINT_ADDR = 'tcp://127.0.0.1:5556'
+#PUB_ENDPOINT_ADDR = "ipc://somename"
 SUB_ENDPOINT_ADDR = 'tcp://127.0.0.1:5557'
 
 processList = [

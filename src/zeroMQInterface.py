@@ -5,8 +5,8 @@
 
 import zmq
 import json
-
-PUB_BUFF_SIZE = 10000
+import pdb
+PUB_BUFF_SIZE = 100000
 
 class zeroMQPublisher():
     def __init__(self, endPointAddress):
@@ -36,8 +36,10 @@ class zeroMQPublisher():
         :param str topic: string representing the message topic
         :param dictionary dict: data payload input
         """
+
         serialDict = json.dumps(dict)
-        self.publisher.send_multipart([str.encode(topic),str.encode(str(self.endPointAddress)),str.encode(serialDict)])
+        self.publisher.send_multipart([str.encode(topic),str.encode(str(self.endPointAddress)),
+            str.encode(serialDict)])
 
 
 class ZeroMQSubscriber():
