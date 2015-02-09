@@ -5,7 +5,7 @@ The basic idea is to simplify the ZeroMQ interface by wrapping the publish/subsc
 
 I think one can get a lot of mileage from the pub/sub pattern.  It supports complex network topologies with the ability to filter and buffer data in between nodes.
 
-After using a few different frameworks, I've come to realize that I will probably continuing using different frameworks as everything evolves.  The microservice approach, as well as using a framework agnostic middleware like ZeroMQ, better facilitates this philosophy because each service just acts like an independent networked (TCP or IPC) node.  So, for example, all the CPU-bound tasks can be done in Python, and all the IO bound tasks in Node, or every permutation you can think of.  There's no good reason to throw away good code just because it's not written in the hip new language.   
+After using a few different frameworks, I've come to realize that I will probably continuing using different frameworks as everything evolves.  The microservice approach, as well as using a framework agnostic middleware like ZeroMQ, better facilitates this philosophy because each service just acts like an independent networked (TCP or IPC) node.  So, for example, all the CPU-bound tasks can be done in Python, and all the web serving tasks in Node, or every permutation you can think of.  There may be no good reason to throw away good code just because it's not written in a hip new language.   
 
 This repo is also my experiment with Docker.  Besides all the obvious benefits of Docker, utilizing the (Docker) image also simplifies the dependency setup required to run everything.
 
