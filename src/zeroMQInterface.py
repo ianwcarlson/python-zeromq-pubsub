@@ -1,6 +1,9 @@
 """
-.. module:: dictToZeroMQ
-    :synopsis: Takes in dictionary and sends out over ZeroMQ
+.. module:: zeroMQInterface
+    :synopsis: Wraps ZeroMQ library with a simplified publish/subscribe \
+    interface.  The serialize data protocol is MessagePack.  The python 
+    dictionary is used as a standardized format.  The subscribe gets the 
+    contents of messages, but also the publisher address and the topic.
 """
 
 import zmq
