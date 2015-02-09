@@ -5,6 +5,7 @@
 
 import zmq
 import json
+import msgpack
 import pdb
 PUB_BUFF_SIZE = 100000
 
@@ -31,15 +32,15 @@ class zeroMQPublisher():
     def send(self, topic, dict):
         """
         Main send function over ZeroMQ socket.  Input dictionary gets
-         serialized and sent over wire.
+        serialized and sent over wire.
 
         :param str topic: string representing the message topic
         :param dictionary dict: data payload input
         """
 
-        serialDict = json.dumps(dict)
-        self.publisher.send_multipart([str.encode(topic),str.encode(str(self.endPointAddress)),
-            str.encode(serialDict)])
+        serialDict = msgpack.dumps(dict)
+        self.publisher.send_multipart([str.encode(topic),str.encode(self.endPointAddress),
+            serialDict])
 
 
 class ZeroMQSubscriber():
@@ -74,11 +75,25 @@ class ZeroMQSubscriber():
     def subscribeToTopic(self, topic):
         self.subscriberList[-1].setsockopt(zmq.SUBSCRIBE, str.encode(topic))
 
+    @staticmethod
+    def _convert_keys_to_string(inDict):
+        """
+        Converts byte encoded keys to string.  Need this because msgpack unpack \
+        doesn't decode all the elements in the serialized data stream
+        :param dictionary inDict: any non-nested key value dictionary
+        :return: dictionary 
+        """
+        newDict = {}
+        for key, value in inDict.items():
+            newDict[key.decode()] = value   
+
+        return newDict
+
     def receive(self):
         """
         Method that polls all available connections and returns a dictionary.  This should
         get called continuously to continue receiving messages.
-        :return: dictionary of a dictionary
+        :return: list of nested dictionaries
         """
         socks = []
         try:
@@ -91,8 +106,12 @@ class ZeroMQSubscriber():
             for listItem in self.subscriberList:
                 if listItem in socks:
                     topic, pubAddress, contents = listItem.recv_multipart()
-                    responseList.append({'topic': topic.decode(), 
+                    convertedContents = self._convert_keys_to_string(msgpack.loads(contents))
+
+                    responseList.append({
+                        'topic': topic.decode(), 
                         'pubAddress': pubAddress.decode(), 
-                        'contents': json.loads(contents.decode())})
+                        'contents': convertedContents
+                    })                   
 
         return responseList

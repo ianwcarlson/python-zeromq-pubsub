@@ -22,3 +22,5 @@ processList = [
         'endPoint': SUB_ENDPOINT_ADDR
     }
 ]
+
+NUM_TEST_MSGS = 10000

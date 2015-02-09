@@ -16,7 +16,19 @@ import processManager
 sys.path.append(os.path.join(scriptDir,'testFixtures'))
 import appNetworkConfig
 
+class StatusPrinter():
+	def __init__(self, printCount):
+		self.counter = 0
+		self.printCount = printCount
 
+	def incrementCounter(self):
+		if (self.counter%self.printCount==0):
+			sys.stdout.write('.')
+		self.counter += 1
+
+	def resetCounter(self):
+		self.counter = 0
+		print('.')
 
 class TestZeroMQInterface(unittest.TestCase):
 	def setUp(self):
@@ -30,8 +42,6 @@ class TestZeroMQInterface(unittest.TestCase):
 			'processName': os.path.join(scriptDir,'testFixtures','sub.py'),
 			'endPoint': appNetworkConfig.SUB_ENDPOINT_ADDR
 		}
-		#self.processManager.addProcess(newProcess)
-		#self.publisher = zeroMQInterface.zeroMQPublisher(appNetworkConfig.PUB_ENDPOINT_ADDR)
 		self.subscriber = zeroMQInterface.ZeroMQSubscriber()
 		self.subscriber.connectSubscriber(appNetworkConfig.PUB_ENDPOINT_ADDR)
 		self.subscriber.subscribeToTopic('fancy')
@@ -43,23 +53,23 @@ class TestZeroMQInterface(unittest.TestCase):
 		time.sleep(2)
 		count = 0
 		stallCnt = 0
+		statusPrinter = StatusPrinter(1000)
+		print ('Checking each message...')
 		while(True):
-			if (stallCnt = 100000):
+			if (stallCnt == 100):
+				print ('test stalled out')
 				break
-				
+
 			response = self.subscriber.receive()
 			if (len(response)>0):
-				#print ('response: ' + str(response))
+				statusPrinter.incrementCounter()
 				responseCount = response[0]['contents']['count']
 				self.assertEqual(responseCount, count)
 				count += 1
-				if (responseCount >= 10000):
+				if (responseCount >= appNetworkConfig.NUM_TEST_MSGS):
 					break
 			else:
 				stallCnt += 1
-			time.sleep(0.000001)
-
-
 
 
 if __name__ == '__main__':
