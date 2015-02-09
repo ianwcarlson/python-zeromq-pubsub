@@ -12,7 +12,7 @@ This repo is also my experiment with Docker.  Besides all the obvious benefits o
 # Installation
 - Install [Docker](https://docs.docker.com/installation/)
 - Install [Git](http://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- Git clone this repo `git clone https://github.com/ianwcarlson/hatTeamSelector` in your development directory
+- Git clone this repo `git clone https://github.com/ianwcarlson/python-zeromq-pubsub` in your development directory
 - Then start the Docker daemon `boot2docker start` if you're using boot2docker.  You may need to export the environment variables when prompted.  You can add them your ~/.bashrc in Linux or ~/.bash_profile in Mac.  The image is built for x86_64 architecture.  
 - Then `docker pull ianwcarlson/python-zeromq`, which should download the built image.  This may take a few minutes if it's your first time downloading the Ubuntu 14.04 base image.
 - To run the container you'll need mount the project root directory on your host to the /usr/local/ in the container.  Something like `docker run --rm=true -i -t -v <path to project root>:/usr/local ianwcarlson/python-zeromq python3 /usr/local/test/testZeroMQInterface.py`.  I like to remove the stopped container when it's done via the `--rm=true` option for development.  Ideally you'd want to spin a multiple containers for each major process, but then I think you can only use TCP sockets instead of IPC.  
