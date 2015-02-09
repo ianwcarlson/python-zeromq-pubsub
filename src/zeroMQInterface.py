@@ -95,7 +95,8 @@ class ZeroMQSubscriber():
     def receive(self):
         """
         Method that polls all available connections and returns a dictionary.  This should
-        get called continuously to continue receiving messages.
+        get called continuously to continue receiving messages.  Currently, this function
+        will not block if no messages are available.  
         :return: list of nested dictionaries
         """
         socks = []
