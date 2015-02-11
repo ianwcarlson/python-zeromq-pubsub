@@ -5,7 +5,7 @@
     dictionary is used as a standardized format.  The subscribe gets the 
     contents of messages, but also the publisher address and the topic.
 """
-
+import os
 import zmq
 import json
 import msgpack
@@ -65,6 +65,49 @@ class ZeroMQSubscriber():
 
         self.context.term()
 
+    def importProcessConfig(self, configFilePath):
+        self.processList = self._separatePathAndModule(configFilePath)
+        if (len(self.processList != 0)):
+            self.processConfigDict = self._extractProcessConfig(self.processList)
+            if (self.processConfigDict = {}):
+                raise ValueError("Process configuration not found in config file")
+
+            if ('subscriptions' in processConfigDict):
+                for subDict in processConfigDict['subscriptions']:
+                    if ('endPoint' in subDict):
+                        self.connectSubscriber(subDict['endPoint'])
+                        if ('topics' in subDict):
+                            for (topic in subDict['topics']):
+                                self.subscribeToTopic(topic)
+                    else:
+                        raise ValueError("No endpoint specified in process config")
+            else:
+                raise ValueError("No endpoint specified in process config")
+
+    def _extractProcessConfig(self, processList):
+        processDict = {}
+        fullFilePath = os.path.realpath(__file__)
+        for process in processList:
+            if (process['processName'] == fullFilePath):
+                processDict = process
+                break
+
+        return processDict
+
+    def _separatePathAndModule(self, fullPath):
+        processList = []
+        try:
+            path, fileName = os.path.split(fullPath)
+            moduleName = fileName.rstrip('.py')
+            sys.path.append(path)
+            module = importlib.import_module(moduleName)
+            processList = getattr(module, processList)
+        except:
+            raise ValueError("Unable to import module at specified path")
+
+        return processList
+
+
     def connectSubscriber(self, endPointAddress):
         """
         Method to create subscriber connection to a particular publisher
@@ -81,7 +124,7 @@ class ZeroMQSubscriber():
     @staticmethod
     def _convert_keys_to_string(inDict):
         """
-        Converts byte encoded keys to string.  Need this because msgpack unpack \
+        Converts byte encoded keys to string.  Need this because msgpack unpack 
         doesn't decode all the elements in the serialized data stream
         :param dictionary inDict: any non-nested key value dictionary
         :return: dictionary 
