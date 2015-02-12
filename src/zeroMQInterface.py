@@ -1,6 +1,6 @@
 """
 .. module:: zeroMQInterface
-    :synopsis: Wraps ZeroMQ library with a simplified publish/subscribe \
+    :synopsis: Wraps ZeroMQ library with a simplified publish/subscribe
     interface.  The serialize data protocol is MessagePack.  The python 
     dictionary is used as a standardized format.  The subscribe gets the 
     contents of messages, but also the publisher address and the topic.
@@ -15,10 +15,18 @@ import pdb
 PUB_BUFF_SIZE = 100000
 
 # static functions
-def _extractProcessConfig(processList, subscriberPath):
+def _extractProcessConfig(processList, processPath):
+    """
+    Tries to find specific process dictionary settings at supplied
+    process path.
+    :param processList: list of processes dictionaries
+    :type processList: list 
+    :return: dictionary of process settings
+    :raises: ValueError
+    """
     processDict = {}
     for process in processList:
-        if (process['processName'] == subscriberPath):
+        if (process['processName'] == processPath):
             processDict = process
             break
     
@@ -28,6 +36,14 @@ def _extractProcessConfig(processList, subscriberPath):
     return processDict
 
 def _separatePathAndModule(fullPath):
+    """
+    Tries to dynamically import module at specified path.  If successful,
+    then the process list retrieved
+    :param fullPath: full path to the config file 
+    :type fullPath: str
+    :return: list of process dictionaries
+    :raises: ValueError
+    """
     processList = []
 
     try:
@@ -62,10 +78,18 @@ class ZeroMQPublisher():
         self.publisher.close()
         self.context.term()
 
-    def importProcessConfig(self, configFilePath, subscriberPath=os.path.realpath(__file__)):
+    def importProcessConfig(self, configFilePath, publisherPath=os.path.realpath(__file__)):
+        """
+        Registers publisher settings based off config file
+        :param configFilePath: full config file path
+        :type configFilePath: str
+        :param publisherPath: path to publisher process file (defaults to current file)
+        :type publisherPath: str
+        :raises: ValueError    
+        """
 
         self.processList = _separatePathAndModule(configFilePath)
-        self.processConfigDict = _extractProcessConfig(self.processList, subscriberPath)
+        self.processConfigDict = _extractProcessConfig(self.processList, publisherPath)
 
         if ('endPoint' in self.processConfigDict):
             self.endPointAddress = self.processConfigDict['endPoint']
@@ -106,7 +130,14 @@ class ZeroMQSubscriber():
         self.context.term()
 
     def importProcessConfig(self, configFilePath, subscriberPath=os.path.realpath(__file__)):
-
+        """
+        Registers subscriber settings based off config file
+        :param configFilePath: full config file path
+        :type configFilePath: str
+        :param subscriberPath: path to subscriber process file (defaults to current file)
+        :type subscriberPath: str
+        :raises: ValueError    
+        """
         self.processList = _separatePathAndModule(configFilePath)
         self.processConfigDict = _extractProcessConfig(self.processList, subscriberPath)
 
@@ -135,6 +166,11 @@ class ZeroMQSubscriber():
         self.poller.register(self.subscriberList[-1], zmq.POLLIN)
 
     def subscribeToTopic(self, topic):
+        """
+        Subscribes class instance to most recently connected subscriber
+        :param topic: topic to subscriber to (filters other topics if not subscribed)
+        :type topic: str
+        """
         self.subscriberList[-1].setsockopt(zmq.SUBSCRIBE, str.encode(topic))
 
     @staticmethod
