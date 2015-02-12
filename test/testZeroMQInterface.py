@@ -46,8 +46,31 @@ class TestZeroMQInterface(unittest.TestCase):
 		self.subscriber.connectSubscriber(appNetworkConfig.PUB_ENDPOINT_ADDR)
 		self.subscriber.subscribeToTopic('fancy')
 
+	def test_importProcessConfig(self):
+		configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig2.py')
+		subPath = os.path.join(scriptDir,'testFixtures','sub.py')
+		self.subscriber.importProcessConfig(configPath, subPath)
 
-	def test_send_basic_message(self):
+		configPath = os.path.join(scriptDir,'testFixtures','badNetworkConfig1.py')	
+		self.assertRaises(ValueError, self.subscriber.importProcessConfig, configPath, subPath)
+
+		configPath = os.path.join(scriptDir,'testFixtures','badNetworkConfig2.py')	
+		self.assertRaises(ValueError, self.subscriber.importProcessConfig, configPath, subPath)
+
+		configPath = os.path.join(scriptDir,'testFixtures','badNetworkConfig3.py')	
+		self.assertRaises(ValueError, self.subscriber.importProcessConfig, configPath, subPath)
+
+		badSubPath = os.path.join(scriptDir,'testFixtures','sub5.py')
+		self.assertRaises(ValueError, self.subscriber.importProcessConfig, configPath, badSubPath)
+
+		self.publisher = zeroMQInterface.ZeroMQPublisher()
+		pubPath = os.path.join(scriptDir,'testFixtures','pub.py')
+		self.publisher.importProcessConfig(configPath, pubPath)
+
+		badPubPath = os.path.join(scriptDir,'testFixtures','pub5.py')
+		self.assertRaises(ValueError, self.publisher.importProcessConfig, configPath, badPubPath)
+
+	def _test_send_basic_message(self):
 		self.processManager.run()
 
 		time.sleep(2)

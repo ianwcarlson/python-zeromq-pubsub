@@ -13,7 +13,7 @@ import time
 
 print('sending ' + str(appNetworkConfig.NUM_TEST_MSGS) + ' messages')
 count = 0
-publisher = zeroMQInterface.zeroMQPublisher(appNetworkConfig.PUB_ENDPOINT_ADDR)
+publisher = zeroMQInterface.ZeroMQPublisher(appNetworkConfig.PUB_ENDPOINT_ADDR)
 basicMsg = {
 	'count': count
 }

@@ -6,24 +6,54 @@
     contents of messages, but also the publisher address and the topic.
 """
 import os
+import sys
 import zmq
 import json
 import msgpack
+import importlib
 import pdb
 PUB_BUFF_SIZE = 100000
 
-class zeroMQPublisher():
-    def __init__(self, endPointAddress):
+# static functions
+def _extractProcessConfig(processList, subscriberPath):
+    processDict = {}
+    for process in processList:
+        if (process['processName'] == subscriberPath):
+            processDict = process
+            break
+    
+    if (not(processDict)):
+        raise ValueError("Process configuration not found in config file")
+
+    return processDict
+
+def _separatePathAndModule(fullPath):
+    processList = []
+
+    try:
+        path, fileName = os.path.split(fullPath)
+        moduleName = fileName.rstrip('.py')
+        sys.path.append(path)
+        module = importlib.import_module(moduleName)
+        processList = getattr(module, 'processList')
+    except:
+        raise ValueError("Unable to import module at specified path")
+
+    return processList
+
+class ZeroMQPublisher():
+    def __init__(self, endPointAddress=None):
         """
         Constructor.  Sets up ZeroMQ publisher socket.
 
         :param number port: integer designating the port number of the publisher
         """
         self.context = zmq.Context()
-        self.endPointAddress = endPointAddress
         self.publisher = self.context.socket(zmq.PUB)
-        self.publisher.bind(endPointAddress)
         self.publisher.set_hwm(PUB_BUFF_SIZE)
+        if (endPointAddress is not(None)):
+            self.endPointAddress = endPointAddress
+            self.publisher.bind(endPointAddress)
 
     def __del__(self):
         """
@@ -31,6 +61,16 @@ class zeroMQPublisher():
         """
         self.publisher.close()
         self.context.term()
+
+    def importProcessConfig(self, configFilePath, subscriberPath=os.path.realpath(__file__)):
+
+        self.processList = _separatePathAndModule(configFilePath)
+        self.processConfigDict = _extractProcessConfig(self.processList, subscriberPath)
+
+        if ('endPoint' in self.processConfigDict):
+            self.endPointAddress = self.processConfigDict['endPoint']
+        else:
+            raise ValueError("'endPoint' missing from process config")
 
     def send(self, topic, dict):
         """
@@ -65,48 +105,24 @@ class ZeroMQSubscriber():
 
         self.context.term()
 
-    def importProcessConfig(self, configFilePath):
-        self.processList = self._separatePathAndModule(configFilePath)
-        if (len(self.processList != 0)):
-            self.processConfigDict = self._extractProcessConfig(self.processList)
-            if (self.processConfigDict = {}):
-                raise ValueError("Process configuration not found in config file")
+    def importProcessConfig(self, configFilePath, subscriberPath=os.path.realpath(__file__)):
 
-            if ('subscriptions' in processConfigDict):
-                for subDict in processConfigDict['subscriptions']:
-                    if ('endPoint' in subDict):
-                        self.connectSubscriber(subDict['endPoint'])
-                        if ('topics' in subDict):
-                            for (topic in subDict['topics']):
-                                self.subscribeToTopic(topic)
+        self.processList = _separatePathAndModule(configFilePath)
+        self.processConfigDict = _extractProcessConfig(self.processList, subscriberPath)
+
+        if ('subscriptions' in self.processConfigDict):
+            for subDict in self.processConfigDict['subscriptions']:
+                if ('endPoint' in subDict):
+                    self.connectSubscriber(subDict['endPoint'])
+                    if ('topics' in subDict):
+                        for topic in subDict['topics']:
+                            self.subscribeToTopic(topic)
                     else:
-                        raise ValueError("No endpoint specified in process config")
-            else:
-                raise ValueError("No endpoint specified in process config")
-
-    def _extractProcessConfig(self, processList):
-        processDict = {}
-        fullFilePath = os.path.realpath(__file__)
-        for process in processList:
-            if (process['processName'] == fullFilePath):
-                processDict = process
-                break
-
-        return processDict
-
-    def _separatePathAndModule(self, fullPath):
-        processList = []
-        try:
-            path, fileName = os.path.split(fullPath)
-            moduleName = fileName.rstrip('.py')
-            sys.path.append(path)
-            module = importlib.import_module(moduleName)
-            processList = getattr(module, processList)
-        except:
-            raise ValueError("Unable to import module at specified path")
-
-        return processList
-
+                        print('Warning: No topics found for subscribed endpoint: ' + str(subDict['endPoint']))
+                else:
+                    raise ValueError("No endpoint specified in process config")
+        else:
+            raise ValueError("No subscriptions specified in process config")
 
     def connectSubscriber(self, endPointAddress):
         """
