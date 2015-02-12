@@ -7,7 +7,7 @@ import os
 import sys
 scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
-import toZeroMQ
+import zeroMQInterface
 import appConfigConstants
 
 sys.path.append(os.path.join(scriptDir,'scripts','lib'))
@@ -19,16 +19,10 @@ import time
 class Logger:
     def __init__(self, logFileName=os.path.join('logs',time.strftime('%d_%b_%Y_%H:%M:%S_LT', time.localtime()))):
         """
-        Constructor.  Initializes logger class with subscriptions.  Will use local time for the file name by default.
+        Constructor.  Will use local time for the file name by default.
         :param logFileName: file name to use for logging.
         :type logFileName: str
         """
-        self.subscriber = toZeroMQ.ZeroMQSubscriber()
-        self.subscriber.connectSubscriber(appConfigConstants.K9_HW_IF_ENDPOINT_ADDR)
-        self.subscriber.subscribeToTopic('log')
-
-        self.subscriber.connectSubscriber(appConfigConstants.SQLITE_DB_ENDPOINT_ADDR)
-        self.subscriber.subscribeToTopic('log')   
 
         self.setLogConfig(logFileName)
 

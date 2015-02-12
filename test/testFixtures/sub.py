@@ -13,8 +13,8 @@ import time
 import pdb
 
 subscriber = zeroMQInterface.ZeroMQSubscriber()
-subscriber.connectSubscriber(appNetworkConfig.PUB_ENDPOINT_ADDR)
-subscriber.subscribeToTopic('fancy')
+subscriber.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'))
+
 time.sleep(0.001)
 while(True):
 	response = subscriber.receive()

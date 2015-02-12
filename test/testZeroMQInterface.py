@@ -8,6 +8,7 @@ import sys
 import unittest
 import pdb
 import time
+import subprocess
 scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
 sys.path.append(os.path.join(scriptDir,'..','src'))
@@ -15,6 +16,7 @@ import zeroMQInterface
 import processManager
 sys.path.append(os.path.join(scriptDir,'testFixtures'))
 import appNetworkConfig
+
 
 class StatusPrinter():
 	def __init__(self, printCount):
@@ -33,21 +35,22 @@ class StatusPrinter():
 class TestZeroMQInterface(unittest.TestCase):
 	def setUp(self):
 		self.processManager = processManager.ProcessManager()
-		newProcess = {
-			'processName': os.path.join(scriptDir,'testFixtures','pub.py'),
-			'endPoint': appNetworkConfig.PUB_ENDPOINT_ADDR
-		}
-		self.processManager.addProcess(newProcess)
-		newProcess = {
-			'processName': os.path.join(scriptDir,'testFixtures','sub.py'),
-			'endPoint': appNetworkConfig.SUB_ENDPOINT_ADDR
-		}
+		#newProcess = {
+		#	'processName': os.path.join(scriptDir,'testFixtures','pub.py'),
+		#	'endPoint': appNetworkConfig.PUB_ENDPOINT_ADDR
+		#}
+		#self.processManager.addProcess(newProcess)
+		#newProcess = {
+		#	'processName': os.path.join(scriptDir,'testFixtures','sub.py'),
+		#	'endPoint': appNetworkConfig.SUB_ENDPOINT_ADDR
+		#}
 		self.subscriber = zeroMQInterface.ZeroMQSubscriber()
-		self.subscriber.connectSubscriber(appNetworkConfig.PUB_ENDPOINT_ADDR)
-		self.subscriber.subscribeToTopic('fancy')
+		self.configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig2.py')
+		#self.subscriber.connectSubscriber(appNetworkConfig.PUB_ENDPOINT_ADDR)
+		#self.subscriber.subscribeToTopic('fancy')
 
-	def test_importProcessConfig(self):
-		configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig2.py')
+	def _testImportProcessConfig(self):
+		configPath = self.configPath
 		subPath = os.path.join(scriptDir,'testFixtures','sub.py')
 		self.subscriber.importProcessConfig(configPath, subPath)
 
@@ -70,8 +73,14 @@ class TestZeroMQInterface(unittest.TestCase):
 		badPubPath = os.path.join(scriptDir,'testFixtures','pub5.py')
 		self.assertRaises(ValueError, self.publisher.importProcessConfig, configPath, badPubPath)
 
-	def _test_send_basic_message(self):
-		self.processManager.run()
+
+	def testSendBasicMessage(self):
+		#self.processManager.importProcessConfig(self.configPath)
+		subprocess.Popen([
+			'python3', os.path.join(scriptDir,'testFixtures','pub.py'), 'publisher'],
+			stdout=True)
+		self.subscriber.importProcessConfig(self.configPath, 'subscriber2')
+
 
 		time.sleep(2)
 		count = 0
@@ -80,10 +89,12 @@ class TestZeroMQInterface(unittest.TestCase):
 		print ('Checking each message...')
 		while(True):
 			if (stallCnt == 100):
-				print ('test stalled out')
+				print ('Test stalled out')
+				self.assertTrue(False)
 				break
 
 			response = self.subscriber.receive()
+			#print('response: ' + str(response))
 			if (len(response)>0):
 				statusPrinter.incrementCounter()
 				responseCount = response[0]['contents']['count']

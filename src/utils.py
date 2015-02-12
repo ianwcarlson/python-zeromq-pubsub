@@ -18,8 +18,7 @@ def separatePathAndModule(fullPath):
     processList = []
 
     try:
-        path, fileName = os.path.split(fullPath)
-        moduleName = fileName.rstrip('.py')
+        moduleName, path = getModuleName(fullPath)
         sys.path.append(path)
         module = importlib.import_module(moduleName)
         processList = getattr(module, 'processList')
@@ -27,3 +26,8 @@ def separatePathAndModule(fullPath):
         raise ValueError("Unable to import module at specified path")
 
     return processList
+
+def getModuleName(fullPath):
+    path, fileName = os.path.split(fullPath)
+    moduleName = fileName.rstrip('.py')
+    return moduleName, path

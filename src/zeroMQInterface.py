@@ -29,7 +29,7 @@ def _extractProcessConfig(processList, processPath):
     """
     processDict = {}
     for process in processList:
-        if (process['processName'] == processPath):
+        if ('processName' in process and process['processName'] == processPath):
             processDict = process
             break
     
@@ -59,7 +59,7 @@ class ZeroMQPublisher():
         self.publisher.close()
         self.context.term()
 
-    def importProcessConfig(self, configFilePath, publisherPath=os.path.realpath(__file__)):
+    def importProcessConfig(self, configFilePath, publisherName=utils.getModuleName(os.path.realpath(__file__))):
         """
         Registers publisher settings based off config file
         :param configFilePath: full config file path
@@ -70,10 +70,12 @@ class ZeroMQPublisher():
         """
 
         self.processList = utils.separatePathAndModule(configFilePath)
-        self.processConfigDict = _extractProcessConfig(self.processList, publisherPath)
+        self.processConfigDict = _extractProcessConfig(self.processList, publisherName)
 
         if ('endPoint' in self.processConfigDict):
             self.endPointAddress = self.processConfigDict['endPoint']
+            self.publisher.bind(self.endPointAddress)
+            print ('publisher binding to address ' + str(self.endPointAddress))
         else:
             raise ValueError("'endPoint' missing from process config")
 
@@ -110,7 +112,7 @@ class ZeroMQSubscriber():
 
         self.context.term()
 
-    def importProcessConfig(self, configFilePath, subscriberPath=os.path.realpath(__file__)):
+    def importProcessConfig(self, configFilePath, subscriberName=utils.getModuleName(os.path.realpath(__file__))):
         """
         Registers subscriber settings based off config file
         :param configFilePath: full config file path
@@ -120,7 +122,7 @@ class ZeroMQSubscriber():
         :raises: ValueError    
         """
         self.processList = utils.separatePathAndModule(configFilePath)
-        self.processConfigDict = _extractProcessConfig(self.processList, subscriberPath)
+        self.processConfigDict = _extractProcessConfig(self.processList, subscriberName)
 
         if ('subscriptions' in self.processConfigDict):
             for subDict in self.processConfigDict['subscriptions']:
@@ -129,6 +131,7 @@ class ZeroMQSubscriber():
                     if ('topics' in subDict):
                         for topic in subDict['topics']:
                             self.subscribeToTopic(topic)
+                            print('subscribing to topic ' + str(topic))
                     else:
                         print('Warning: No topics found for subscribed endpoint: ' + str(subDict['endPoint']))
                 else:
@@ -145,6 +148,7 @@ class ZeroMQSubscriber():
         self.subscriberList.append(self.context.socket(zmq.SUB))
         self.subscriberList[-1].connect(endPointAddress)
         self.poller.register(self.subscriberList[-1], zmq.POLLIN)
+        print ('connecting subscriber to ' + str(endPointAddress))
 
     def subscribeToTopic(self, topic):
         """

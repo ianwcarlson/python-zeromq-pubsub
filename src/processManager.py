@@ -38,13 +38,13 @@ class ProcessManager():
         """
         Add process executable to managed list
 
-        :param inProcessDict: dictionary containing 'processName' and 'endPoint' \
+        :param inProcessDict: dictionary containing 'processName' and 'endPoint' 
         keys that correspond to the python file to run and the IP address of each
         node in the system respectively
         :type inProcessDict: dictionary
         :raises ValueError
         """
-        if ('processName' in inProcessDict and 'endPoint' in inProcessDict):
+        if ('processPath' in inProcessDict and 'endPoint' in inProcessDict):
             self.processInputList.append(inProcessDict)
         else:
             raise ValueError("'processName' or 'endPoint' keys don't exist in input dictionary")
@@ -62,24 +62,26 @@ class ProcessManager():
             raise ValueError("No processes were found in config file")
 
         for process in processList:
-            if ('processName' in process):
+            if ('processPath' in process):
                 self.processInputList.append(inProcessDict)
             else:
-                raise ValueError("'processName' not provided in config file")
+                raise ValueError("'processPath' not provided in config file")
         
     def run(self):
         """
-        Run all processes in process list.  This should evolve to be more responsive \
-        to subprocess handling.  For now, this class assumes python processes but could \
-        be extended to any executable if the permissions and sourced interpretor was \
+        Run all processes in process list.  This should evolve to be more responsive 
+        to subprocess handling.  For now, this class assumes python processes but could 
+        be extended to any executable if the permissions and sourced interpretor was 
         configured properly
 
         """
         # start processes
         for idx in range(len(self.processInputList)):
-            path = os.path.join(scriptDir,self.processInputList[idx]['processName'])
+            path = os.path.join(scriptDir,self.processInputList[idx]['processPath'])
             print ('Starting process: ' + str(path))
-            self.processHandleList.append(subprocess.Popen(['python3', path], stdout=True))
+            self.processHandleList.append(subprocess.Popen([
+                'python3', path, self.processInputList[idx]['processName']], 
+                stdout=True))
 
         # monitor processes to see if they're still aliveps
         while(True):
