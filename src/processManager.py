@@ -7,10 +7,9 @@ import os
 import sys
 import subprocess
 import time
-
 scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
-
+import utils
 import pdb
 
 class ProcessManager():
@@ -49,8 +48,25 @@ class ProcessManager():
             self.processInputList.append(inProcessDict)
         else:
             raise ValueError("'processName' or 'endPoint' keys don't exist in input dictionary")
-        
 
+    def importProcessConfig(self, fullConfigPath):
+        """
+        Imports process configuration file and tries to add all the processes to the master
+        list (to be used for spinning up each process).
+        :param fullConfigPath: full file path to process config file
+        :type fullConfigPath: str
+        :raises: ValueError
+        """
+        processList = utils.separatePathAndModule(fullConfigPath)
+        if (len(processList) == 0):
+            raise ValueError("No processes were found in config file")
+
+        for process in processList:
+            if ('processName' in process):
+                self.processInputList.append(inProcessDict)
+            else:
+                raise ValueError("'processName' not provided in config file")
+        
     def run(self):
         """
         Run all processes in process list.  This should evolve to be more responsive \

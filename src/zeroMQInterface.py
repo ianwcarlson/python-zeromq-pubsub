@@ -7,11 +7,14 @@
 """
 import os
 import sys
+scriptDir=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(scriptDir)
 import zmq
 import json
 import msgpack
 import importlib
 import pdb
+import utils
 PUB_BUFF_SIZE = 100000
 
 # static functions
@@ -34,28 +37,6 @@ def _extractProcessConfig(processList, processPath):
         raise ValueError("Process configuration not found in config file")
 
     return processDict
-
-def _separatePathAndModule(fullPath):
-    """
-    Tries to dynamically import module at specified path.  If successful,
-    then the process list retrieved
-    :param fullPath: full path to the config file 
-    :type fullPath: str
-    :return: list of process dictionaries
-    :raises: ValueError
-    """
-    processList = []
-
-    try:
-        path, fileName = os.path.split(fullPath)
-        moduleName = fileName.rstrip('.py')
-        sys.path.append(path)
-        module = importlib.import_module(moduleName)
-        processList = getattr(module, 'processList')
-    except:
-        raise ValueError("Unable to import module at specified path")
-
-    return processList
 
 class ZeroMQPublisher():
     def __init__(self, endPointAddress=None):
@@ -88,7 +69,7 @@ class ZeroMQPublisher():
         :raises: ValueError    
         """
 
-        self.processList = _separatePathAndModule(configFilePath)
+        self.processList = utils.separatePathAndModule(configFilePath)
         self.processConfigDict = _extractProcessConfig(self.processList, publisherPath)
 
         if ('endPoint' in self.processConfigDict):
@@ -138,7 +119,7 @@ class ZeroMQSubscriber():
         :type subscriberPath: str
         :raises: ValueError    
         """
-        self.processList = _separatePathAndModule(configFilePath)
+        self.processList = utils.separatePathAndModule(configFilePath)
         self.processConfigDict = _extractProcessConfig(self.processList, subscriberPath)
 
         if ('subscriptions' in self.processConfigDict):
