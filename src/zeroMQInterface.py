@@ -75,7 +75,7 @@ class ZeroMQPublisher():
         if ('endPoint' in self.processConfigDict):
             self.endPointAddress = self.processConfigDict['endPoint']
             self.publisher.bind(self.endPointAddress)
-            print ('publisher binding to address ' + str(self.endPointAddress))
+            print (publisherName + ' binding to address ' + str(self.endPointAddress))
         else:
             raise ValueError("'endPoint' missing from process config")
 
@@ -128,6 +128,7 @@ class ZeroMQSubscriber():
             for subDict in self.processConfigDict['subscriptions']:
                 if ('endPoint' in subDict):
                     self.connectSubscriber(subDict['endPoint'])
+                    print ('connecting ' + subscriberName + ' to ' + str(subDict['endPoint']))
                     if ('topics' in subDict):
                         for topic in subDict['topics']:
                             self.subscribeToTopic(topic)
@@ -148,7 +149,6 @@ class ZeroMQSubscriber():
         self.subscriberList.append(self.context.socket(zmq.SUB))
         self.subscriberList[-1].connect(endPointAddress)
         self.poller.register(self.subscriberList[-1], zmq.POLLIN)
-        print ('connecting subscriber to ' + str(endPointAddress))
 
     def subscribeToTopic(self, topic):
         """
@@ -158,8 +158,13 @@ class ZeroMQSubscriber():
         """
         self.subscriberList[-1].setsockopt(zmq.SUBSCRIBE, str.encode(topic))
 
-    @staticmethod
-    def _convert_keys_to_string(inDict):
+    def _byteToString(self, inBytes):
+        if (type(inBytes)==bytes):
+            return inBytes.decode()
+        else:
+            return inBytes
+
+    def _convert_keys_to_string(self, inDict):
         """
         Converts byte encoded keys to string.  Need this because msgpack unpack 
         doesn't decode all the elements in the serialized data stream
@@ -168,7 +173,11 @@ class ZeroMQSubscriber():
         """
         newDict = {}
         for key, value in inDict.items():
-            newDict[key.decode()] = value   
+            if (type(value) == dict):
+                # this might blow up, need to test more
+                value = self._convert_keys_to_string(value)
+
+            newDict[self._byteToString(key)] = self._byteToString(value)  
 
         return newDict
 
@@ -181,7 +190,7 @@ class ZeroMQSubscriber():
         """
         socks = []
         try:
-            socks = dict(self.poller.poll(0))
+            socks = dict(self.poller.poll(0.1))
         except:
             print ('exception occurred on subscribed receive function')
 
@@ -190,8 +199,8 @@ class ZeroMQSubscriber():
             for listItem in self.subscriberList:
                 if listItem in socks:
                     topic, pubAddress, contents = listItem.recv_multipart()
-                    convertedContents = self._convert_keys_to_string(msgpack.loads(contents))
 
+                    convertedContents = self._convert_keys_to_string(msgpack.loads(contents)) 
                     responseList.append({
                         'topic': topic.decode(), 
                         'pubAddress': pubAddress.decode(), 

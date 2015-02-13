@@ -49,10 +49,10 @@ class TestZeroMQInterface(unittest.TestCase):
 		#self.subscriber.connectSubscriber(appNetworkConfig.PUB_ENDPOINT_ADDR)
 		#self.subscriber.subscribeToTopic('fancy')
 
-	def _testImportProcessConfig(self):
+	def testImportProcessConfig(self):
 		configPath = self.configPath
 		subPath = os.path.join(scriptDir,'testFixtures','sub.py')
-		self.subscriber.importProcessConfig(configPath, subPath)
+		self.subscriber.importProcessConfig(configPath, 'subscriber1')
 
 		configPath = os.path.join(scriptDir,'testFixtures','badNetworkConfig1.py')	
 		self.assertRaises(ValueError, self.subscriber.importProcessConfig, configPath, subPath)
@@ -82,7 +82,7 @@ class TestZeroMQInterface(unittest.TestCase):
 		self.subscriber.importProcessConfig(self.configPath, 'subscriber2')
 
 
-		time.sleep(2)
+		time.sleep(4)
 		count = 0
 		stallCnt = 0
 		statusPrinter = StatusPrinter(1000)

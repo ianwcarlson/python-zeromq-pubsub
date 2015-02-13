@@ -63,7 +63,7 @@ class ProcessManager():
 
         for process in processList:
             if ('processPath' in process):
-                self.processInputList.append(inProcessDict)
+                self.processInputList.append(process)
             else:
                 raise ValueError("'processPath' not provided in config file")
         
@@ -78,7 +78,7 @@ class ProcessManager():
         # start processes
         for idx in range(len(self.processInputList)):
             path = os.path.join(scriptDir,self.processInputList[idx]['processPath'])
-            print ('Starting process: ' + str(path))
+            print ('Starting process: ' + str(path) + ' ' + self.processInputList[idx]['processName'])
             self.processHandleList.append(subprocess.Popen([
                 'python3', path, self.processInputList[idx]['processName']], 
                 stdout=True))

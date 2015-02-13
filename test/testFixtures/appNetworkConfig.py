@@ -23,4 +23,4 @@ processList = [
     }
 ]
 
-NUM_TEST_MSGS = 10000
+NUM_TEST_MSGS = 2

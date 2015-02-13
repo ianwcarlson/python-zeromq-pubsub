@@ -11,16 +11,23 @@ sys.path.append(os.path.join(scriptDir,'..','..','src'))
 import zeroMQInterface
 import time
 import pdb
+import loggerMQ
 
 subscriber = zeroMQInterface.ZeroMQSubscriber()
-subscriber.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'))
+subscriber.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
+
+publisher = zeroMQInterface.ZeroMQPublisher()
+publisher.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
+
+logAdapter = loggerMQ.LogMessageAdapter(sys.argv[1])
 
 time.sleep(0.001)
 while(True):
 	response = subscriber.receive()
-	if (len(response)>0):
-		print ('response: ' + str(response))
-		if (response[0]['contents']['count'] >= 100):
+	for item in response:
+		publisher.send('log', logAdapter.genLogMessage(logLevel=3, message=item))
+		if (response[0]['contents']['count'] >= appNetworkConfig.NUM_TEST_MSGS):
+			publisher.send('proc', {'action': 'stop'})
 			break
 
 	
