@@ -25,7 +25,7 @@ time.sleep(0.001)
 while(True):
 	response = subscriber.receive()
 	for item in response:
-		publisher.send('log', logAdapter.genLogMessage(logLevel=3, message=item))
+		publisher.send('log', logAdapter.genLogMessage(logLevel=1, message=item))
 		if (response[0]['contents']['count'] >= appNetworkConfig.NUM_TEST_MSGS):
 			publisher.send('proc', {'action': 'stop'})
 			break

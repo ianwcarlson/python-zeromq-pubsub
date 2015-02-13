@@ -31,3 +31,28 @@ def getModuleName(fullPath):
     path, fileName = os.path.split(fullPath)
     moduleName = fileName.rstrip('.py')
     return moduleName, path
+
+def getDateTimeNoSpaces():
+    from datetime import datetime
+    return datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+
+def getDateTimeWithSpacesAndPrecision():
+    from datetime import datetime
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+
+def convLogLevelNumToString(logLevelNum):
+    numString = ''
+    if (logLevelNum == 0):
+        numString = 'DEBUG'
+    elif (logLevelNum == 1):
+        numString = 'INFO'
+    elif (logLevelNum == 2):
+        numString = 'WARNING'
+    elif (logLevelNum == 3):
+        numString = 'ERROR'
+    elif (logLevelNum == 4):
+        numString = 'CRITICAL'
+    else:
+        numString = 'Log Level unrecognized'
+
+    return numString    

@@ -1,12 +1,15 @@
 """
 .. module:: loggerMQ
-    :synopsis: Receives log messages from ZeroMQ publishers and uses Python logger class
+    :synopsis: Receives log messages from ZeroMQ publishers and uses Python logger class.
+    Having trouble getting the logger to work in Docker containers, probably because the
+    Unix logging service is not actually running
 """
 
 import os
 import sys
 scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
+import utils
 import zeroMQInterface
 import pdb
 import logging
@@ -21,6 +24,8 @@ class Logger(zeroMQInterface.ZeroMQSubscriber):
     #    """
 
     #    self.setLogConfig(logFileName)
+
+
 
     def run(self):
         """
@@ -39,20 +44,16 @@ class Logger(zeroMQInterface.ZeroMQSubscriber):
                 logContentsDict = itemDict['contents']
                 logLevel = logContentsDict['logLevel']
                 logString = logContentsDict['pubID'] + ' ' + str(logContentsDict['message'])
-                if (logLevel == 0):
-                    logging.debug(logString)
-                elif (logLevel == 1):
-                    logging.info(logString)
-                elif (logLevel == 2):
-                    logging.warning(logString)
-                elif (logLevel == 3):
-                    logging.error(logString)
-                elif (logLevel == 4):
-                    logging.critical(logString)
-                else:
-                    logging.debug(logString)
+                if (logLevel >= self.fileLogLevel or logLevel >= self.stdoutLogLevel):
+                    fullLogString = utils.getDateTimeWithSpacesAndPrecision() + ' ' + \
+                    utils.convLogLevelNumToString(logLevel) + ' ' + \
+                    logString
+                    if (logLevel >= self.fileLogLevel):
+                        self.logFile.write(fullLogString + '\n')
+                    if (logLevel >= self.stdoutLogLevel):
+                        print(fullLogString)
 
-    def setLogConfig(self, logFileName):
+    def setLogConfig(self, logFileName, fileLogLevel=0, stdoutLogLevel=0):
         """
         Set the logger configuration.  Will create a new 'logs' subfolder if necessary.
         :param logFileName: file name to use for logger
@@ -66,8 +67,13 @@ class Logger(zeroMQInterface.ZeroMQSubscriber):
             # do nothing for now
             print('')
 
-        logging.basicConfig(fileName=logFileName, filemode='w', format='%(asctime)s %(message)s', 
-            level=logging.DEBUG)
+        self.fileLogLevel = fileLogLevel
+        self.stdoutLogLevel = stdoutLogLevel
+        fullLogFileName = logFileName + '_' + utils.getDateTimeNoSpaces() + '.log'
+        self.logFile = open(fullLogFileName, 'w')
+
+    def cleanUp(self):
+        self.logFile.close()
 
 class LogMessageAdapter:
     def __init__(self, pubID=os.path.realpath(__file__)):
