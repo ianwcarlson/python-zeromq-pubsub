@@ -12,6 +12,7 @@ import zeroMQInterface
 import time
 import pdb
 import loggerMQ
+import logMessageAdapter
 
 publisher = zeroMQInterface.ZeroMQPublisher()
 publisher.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])

@@ -46,7 +46,6 @@ def _extractConfigAndAutoPub(publisherRef, configFilePath, publisherName):
 
     if ('endPoint' in processConfigDict):
         endPointAddress = processConfigDict['endPoint']
-        publisherRef.bind(endPointAddress)
         print (publisherName + ' binding to address ' + str(endPointAddress))
     else:
         raise ValueError("'endPoint' missing from process config")
@@ -77,7 +76,8 @@ class ZeroMQPublisher():
         self.endPointAddress = endPointAddress
         self.publisher.bind(endPointAddress)
 
-    def importProcessConfig(self, configFilePath, publisherName=utils.getModuleName(os.path.realpath(__file__))):
+    def importProcessConfig(self, configFilePath, 
+        publisherName=utils.getModuleName(os.path.realpath(__file__))):
         """
         Registers publisher settings based off config file
         :param configFilePath: full config file path
@@ -86,8 +86,9 @@ class ZeroMQPublisher():
         :type publisherPath: str
         :raises: ValueError    
         """
-        self.endPointAddress = _extractConfigAndAutoPub(self.publisher, configFilePath, publisherName)
-
+        self.endPointAddress, self.processConfigDict = _extractConfigAndAutoPub(self.publisher, 
+            configFilePath, publisherName)
+        self.bind(self.endPointAddress, self.processConfigDict)
         #self.processList = utils.separatePathAndModule(configFilePath)
         #self.processConfigDict = _extractProcessConfig(self.processList, publisherName)
 
@@ -121,7 +122,6 @@ class ZeroMQSubscriber():
         self.context = zmq.Context()
         self.subscriberList = []
         self.poller = zmq.Poller()
-        self.logPublisher = ZeroMQPublisher()
 
     def __del__(self):
         """
@@ -131,6 +131,9 @@ class ZeroMQSubscriber():
             item.close()
 
         self.context.term()
+
+    def setPublisherRef(self, publisherRef):
+        self.logPublisher = publisherRef
 
     def importProcessConfig(self, configFilePath, subscriberName=utils.getModuleName(os.path.realpath(__file__))):
         """
