@@ -74,19 +74,3 @@ class Logger(zeroMQInterface.ZeroMQSubscriber):
 
     def cleanUp(self):
         self.logFile.close()
-
-class LogMessageAdapter:
-    def __init__(self, pubID=os.path.realpath(__file__)):
-        self.pubID = pubID
-
-    def genLogMessage(self, logLevel=0, message=''):
-        msgDict = {}
-        msgDict['pubID'] = self.pubID
-        msgDict['logLevel'] = logLevel
-        msgDict['message'] = message
-        return msgDict
-
-#if __name__ == '__main__':
-#
-#    logger = Logger()
-#    logger.run()

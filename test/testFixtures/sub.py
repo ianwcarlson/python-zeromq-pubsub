@@ -12,6 +12,7 @@ import zeroMQInterface
 import time
 import pdb
 import loggerMQ
+import logMessageAdapter
 
 subscriber = zeroMQInterface.ZeroMQSubscriber()
 subscriber.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
@@ -19,7 +20,7 @@ subscriber.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), s
 publisher = zeroMQInterface.ZeroMQPublisher()
 publisher.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
 
-logAdapter = loggerMQ.LogMessageAdapter(sys.argv[1])
+logAdapter = logMessageAdapter.LogMessageAdapter(sys.argv[1])
 
 time.sleep(0.001)
 while(True):

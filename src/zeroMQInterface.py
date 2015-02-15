@@ -15,10 +15,11 @@ import msgpack
 import importlib
 import pdb
 import utils
+import logMessageAdapter
 PUB_BUFF_SIZE = 100000
 
 # static functions
-def _extractProcessConfig(processList, processPath):
+def _extractProcessConfig(processList, processName):
     """
     Tries to find specific process dictionary settings at supplied
     process path.
@@ -29,7 +30,7 @@ def _extractProcessConfig(processList, processPath):
     """
     processDict = {}
     for process in processList:
-        if ('processName' in process and process['processName'] == processPath):
+        if ('processName' in process and process['processName'] == processName):
             processDict = process
             break
     
@@ -37,6 +38,20 @@ def _extractProcessConfig(processList, processPath):
         raise ValueError("Process configuration not found in config file")
 
     return processDict
+
+def _extractConfigAndAutoPub(publisherRef, configFilePath, publisherName):
+
+    processList = utils.separatePathAndModule(configFilePath)
+    processConfigDict = _extractProcessConfig(processList, publisherName)
+
+    if ('endPoint' in processConfigDict):
+        endPointAddress = processConfigDict['endPoint']
+        publisherRef.bind(endPointAddress)
+        print (publisherName + ' binding to address ' + str(endPointAddress))
+    else:
+        raise ValueError("'endPoint' missing from process config")
+
+    return endPointAddress, processConfigDict
 
 class ZeroMQPublisher():
     def __init__(self, endPointAddress=None):
@@ -49,8 +64,7 @@ class ZeroMQPublisher():
         self.publisher = self.context.socket(zmq.PUB)
         self.publisher.set_hwm(PUB_BUFF_SIZE)
         if (endPointAddress is not(None)):
-            self.endPointAddress = endPointAddress
-            self.publisher.bind(endPointAddress)
+            self.bind(endPointAddress)
 
     def __del__(self):
         """
@@ -58,6 +72,10 @@ class ZeroMQPublisher():
         """
         self.publisher.close()
         self.context.term()
+
+    def bind(self, endPointAddress):
+        self.endPointAddress = endPointAddress
+        self.publisher.bind(endPointAddress)
 
     def importProcessConfig(self, configFilePath, publisherName=utils.getModuleName(os.path.realpath(__file__))):
         """
@@ -68,16 +86,17 @@ class ZeroMQPublisher():
         :type publisherPath: str
         :raises: ValueError    
         """
+        self.endPointAddress = _extractConfigAndAutoPub(self.publisher, configFilePath, publisherName)
 
-        self.processList = utils.separatePathAndModule(configFilePath)
-        self.processConfigDict = _extractProcessConfig(self.processList, publisherName)
+        #self.processList = utils.separatePathAndModule(configFilePath)
+        #self.processConfigDict = _extractProcessConfig(self.processList, publisherName)
 
-        if ('endPoint' in self.processConfigDict):
-            self.endPointAddress = self.processConfigDict['endPoint']
-            self.publisher.bind(self.endPointAddress)
-            print (publisherName + ' binding to address ' + str(self.endPointAddress))
-        else:
-            raise ValueError("'endPoint' missing from process config")
+        #if ('endPoint' in self.processConfigDict):
+        #    self.endPointAddress = self.processConfigDict['endPoint']
+        #    self.publisher.bind(self.endPointAddress)
+        #    print (publisherName + ' binding to address ' + str(self.endPointAddress))
+        #else:
+        #    raise ValueError("'endPoint' missing from process config")
 
     def send(self, topic, dict):
         """
@@ -102,6 +121,7 @@ class ZeroMQSubscriber():
         self.context = zmq.Context()
         self.subscriberList = []
         self.poller = zmq.Poller()
+        self.logPublisher = ZeroMQPublisher()
 
     def __del__(self):
         """
@@ -121,14 +141,26 @@ class ZeroMQSubscriber():
         :type subscriberPath: str
         :raises: ValueError    
         """
-        self.processList = utils.separatePathAndModule(configFilePath)
-        self.processConfigDict = _extractProcessConfig(self.processList, subscriberName)
+        #self.processList = utils.separatePathAndModule(configFilePath)
+        #self.processConfigDict = _extractProcessConfig(self.processList, subscriberName)
+        
+        #if ('endPoint' in self.processConfigDict):
+        #    self.endPoint = self.processConfigDict['endPoint']
+        #else:
+        #    raise ValueError('No endpoint provided in process config')
+
+        self.endPointAddress, self.processConfigDict = _extractConfigAndAutoPub(self.logPublisher, 
+            configFilePath, subscriberName)
+
+        self.logAdapter = logMessageAdapter.LogMessageAdapter(subscriberName)
 
         if ('subscriptions' in self.processConfigDict):
             for subDict in self.processConfigDict['subscriptions']:
                 if ('endPoint' in subDict):
                     self.connectSubscriber(subDict['endPoint'])
-                    print ('connecting ' + subscriberName + ' to ' + str(subDict['endPoint']))
+                    #print ('connecting ' + subscriberName + ' to ' + str(subDict['endPoint']))
+                    logMsg = 'connecting ' + subscriberName + ' to ' + str(subDict['endPoint'])
+                    self.logPublisher.send('log', self.logAdapter.genLogMessage(logLevel=1, message=logMsg))
                     if ('topics' in subDict):
                         for topic in subDict['topics']:
                             self.subscribeToTopic(topic)

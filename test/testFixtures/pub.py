@@ -16,7 +16,7 @@ import loggerMQ
 publisher = zeroMQInterface.ZeroMQPublisher()
 publisher.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
 
-logAdapter = loggerMQ.LogMessageAdapter(sys.argv[1])
+logAdapter = logMessageAdapter.LogMessageAdapter(sys.argv[1])
 
 print('Sending ' + str(appNetworkConfig.NUM_TEST_MSGS) + ' messages')
 
