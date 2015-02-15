@@ -24,10 +24,10 @@ class ProcessNode():
         self.logAdapter = logMessageAdapter.LogMessageAdapter(processName)
 
     def send(self, topic, message):
-        self.publisher(topic, message)
+        self.publisher.send(topic, message)
 
     def receive(self):
         return self.subscriber.receive()
 
     def log(self, logLevel, message):
-        publisher.send('log', logAdapter.genLogMessage(logLevel, message))
+        self.publisher.send('log', self.logAdapter.genLogMessage(logLevel, message))

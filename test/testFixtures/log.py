@@ -13,9 +13,8 @@ import time
 import pdb
 import time
 
-logger = loggerMQ.Logger()
+logger = loggerMQ.Logger(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
 logger.setLogConfig(os.path.join(scriptDir,'logs','testLog'))
-logger.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
 
 time.sleep(3)
 logger.run()

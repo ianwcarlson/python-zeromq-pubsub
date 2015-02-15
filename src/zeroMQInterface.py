@@ -39,7 +39,7 @@ def _extractProcessConfig(processList, processName):
 
     return processDict
 
-def _extractConfigAndAutoPub(publisherRef, configFilePath, publisherName):
+def _extractConfig(configFilePath, publisherName):
 
     processList = utils.separatePathAndModule(configFilePath)
     processConfigDict = _extractProcessConfig(processList, publisherName)
@@ -86,9 +86,9 @@ class ZeroMQPublisher():
         :type publisherPath: str
         :raises: ValueError    
         """
-        self.endPointAddress, self.processConfigDict = _extractConfigAndAutoPub(self.publisher, 
-            configFilePath, publisherName)
-        self.bind(self.endPointAddress, self.processConfigDict)
+        self.endPointAddress, self.processConfigDict = _extractConfig(configFilePath, 
+            publisherName)
+        self.bind(self.endPointAddress)
         #self.processList = utils.separatePathAndModule(configFilePath)
         #self.processConfigDict = _extractProcessConfig(self.processList, publisherName)
 
@@ -114,7 +114,7 @@ class ZeroMQPublisher():
 
 
 class ZeroMQSubscriber():
-    def __init__(self):
+    def __init__(self, publisherRef=None):
         """
         Constructor.  Sets up ZeroMQ subscriber socket and poller object
         :return:
@@ -122,6 +122,8 @@ class ZeroMQSubscriber():
         self.context = zmq.Context()
         self.subscriberList = []
         self.poller = zmq.Poller()
+        if (publisherRef is not(None)):
+            self.logPublisher = publisherRef
 
     def __del__(self):
         """
@@ -152,8 +154,8 @@ class ZeroMQSubscriber():
         #else:
         #    raise ValueError('No endpoint provided in process config')
 
-        self.endPointAddress, self.processConfigDict = _extractConfigAndAutoPub(self.logPublisher, 
-            configFilePath, subscriberName)
+        self.endPointAddress, self.processConfigDict = _extractConfig(configFilePath, 
+            subscriberName)
 
         self.logAdapter = logMessageAdapter.LogMessageAdapter(subscriberName)
 
@@ -172,8 +174,6 @@ class ZeroMQSubscriber():
                         print('Warning: No topics found for subscribed endpoint: ' + str(subDict['endPoint']))
                 else:
                     raise ValueError("No endpoint specified in process config")
-        else:
-            raise ValueError("No subscriptions specified in process config")
 
     def connectSubscriber(self, endPointAddress):
         """
