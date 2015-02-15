@@ -16,6 +16,6 @@ import time
 logger = loggerMQ.Logger(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
 logger.setLogConfig(os.path.join(scriptDir,'logs','testLog'))
 
-time.sleep(3)
+time.sleep(0)
 logger.run()
 

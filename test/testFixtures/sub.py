@@ -16,14 +16,10 @@ import logMessageAdapter
 
 processNodeObj = processNode.ProcessNode('appNetworkConfig3.py', sys.argv[1])
 
-time.sleep(0.001)
 while(True):
 	response = processNodeObj.receive()
 	for item in response:
-		processNodeObj.log(logLevel=1, message=item)
+		processNodeObj.log(logLevel=0, message=item)
 		if (response[0]['contents']['count'] >= appNetworkConfig.NUM_TEST_MSGS):
 			processNodeObj.send('proc', {'action': 'stop'})
 			break
-
-	
-	#time.sleep(0.0001)

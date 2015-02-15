@@ -18,13 +18,11 @@ processNode = processNode.ProcessNode('appNetworkConfig3.py', sys.argv[1])
 
 count = 0
 basicMsg = {'count': count}
-time.sleep(2)
 while(True):
 	if (basicMsg['count'] > appNetworkConfig.NUM_TEST_MSGS):
 		break
 
 	processNode.send('fancy', basicMsg)
-	#logMessage = logAdapter.genLogMessage(logLevel=3, message=basicMsg)
-	processNode.log(logLevel=3, message=basicMsg)
+	processNode.log(logLevel=0, message=basicMsg)
 	basicMsg['count'] += 1
 

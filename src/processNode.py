@@ -9,6 +9,7 @@ scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
 import zeroMQInterface
 import logMessageAdapter
+import time
 
 class ProcessNode():
     def __init__(self, appNetworkConfig, processName):
@@ -22,6 +23,14 @@ class ProcessNode():
         self.subscriber.importProcessConfig(os.path.join(scriptDir,appNetworkConfig), processName)
 
         self.logAdapter = logMessageAdapter.LogMessageAdapter(processName)
+
+        # need to wait until zeroMQ socket connections establish, otherwise
+        # messages will be initially lost
+        time.sleep(1)
+
+        self.publisher.logPubConnections()
+        self.subscriber.logSubConnections()
+
 
     def send(self, topic, message):
         self.publisher.send(topic, message)
