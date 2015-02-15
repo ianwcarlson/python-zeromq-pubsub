@@ -11,7 +11,7 @@ sys.path.append(os.path.join(scriptDir,'..','..','src'))
 import processNode
 import time
 import pdb
-import loggerMQ
+import loggerNode
 import logMessageAdapter
 
 processNodeObj = processNode.ProcessNode('appNetworkConfig3.py', sys.argv[1])
