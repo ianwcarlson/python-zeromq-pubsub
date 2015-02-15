@@ -41,7 +41,15 @@ def _extractProcessConfig(processList, processName):
     return processDict
 
 def _extractConfig(configFilePath, publisherName):
-
+    """
+    Extracts the endpoint address and the dictionary that contains other connection
+    information
+    :param configFilePath: path to the network configuration file
+    :type configFilePath: str 
+    :param publisherName: name of publisher
+    :type publisherName: str
+    :returns: endPointAddress (str), processConfigDict (dict)
+    """
     processList = utils.separatePathAndModule(configFilePath)
     processConfigDict = _extractProcessConfig(processList, publisherName)
 
@@ -73,6 +81,11 @@ class ZeroMQPublisher():
         self.context.term()
 
     def bind(self, endPointAddress):
+        """
+        Binds the publisher to the endpoint address
+        :param endPointAddress: endpoint address (e.g., 'tcp://127.0.0.1:5555')
+        :type endPointAddress: str 
+        """
         self.endPointAddress = endPointAddress
         self.publisher.bind(endPointAddress)
 
@@ -93,8 +106,10 @@ class ZeroMQPublisher():
         self.logAdapter = logMessageAdapter.LogMessageAdapter(publisherName)
 
     def logPubConnections(self):
+        """
+        Method that logs the publisher connection information
+        """
         logMsg = 'Binding to address ' + str(self.endPointAddress)
-
         self.send('log', self.logAdapter.genLogMessage(logLevel=1, message=logMsg))
 
     def send(self, topic, dict):
@@ -133,6 +148,11 @@ class ZeroMQSubscriber():
         self.context.term()
 
     def setPublisherRef(self, publisherRef):
+        """
+        Sets the publisher handle so this class can publish log messages
+        :param publisherRef: publisher handle (passed by reference)
+        :type: ZeroMQPublisher()
+        """
         self.logPublisher = publisherRef
 
     def importProcessConfig(self, configFilePath, subscriberName=utils.getModuleName(os.path.realpath(__file__))):
@@ -140,17 +160,14 @@ class ZeroMQSubscriber():
         Registers subscriber settings based off config file
         :param configFilePath: full config file path
         :type configFilePath: str
-        :param subscriberPath: path to subscriber process file (defaults to current file)
-        :type subscriberPath: str
+        :param subscriberName: path to subscriber process file (defaults to current file)
+        :type subscriberName: str
         :raises: ValueError    
         """
         logMsgsList = []
-
         self.subscriberName = subscriberName
-
         self.endPointAddress, self.processConfigDict = _extractConfig(configFilePath, 
             subscriberName)
-
         self.logAdapter = logMessageAdapter.LogMessageAdapter(subscriberName)
 
         if ('subscriptions' in self.processConfigDict):
@@ -186,6 +203,9 @@ class ZeroMQSubscriber():
         self.subscriberList[-1]['socket'].setsockopt(zmq.SUBSCRIBE, str.encode(topic))
 
     def logSubConnections(self):
+        """
+        Method that logs the connections list. 
+        """
         for sub in self.subscriberList:
             
             topicStr = ''
@@ -197,6 +217,11 @@ class ZeroMQSubscriber():
             self.logPublisher.send('log', self.logAdapter.genLogMessage(logLevel=1, message=logMsg))  
 
     def _byteToString(self, inBytes):
+        """
+        Converts bytes to string if needed
+        :param inBytes: input bytes
+        :type inBytes: bytes
+        """
         if (type(inBytes)==bytes):
             return inBytes.decode()
         else:

@@ -13,6 +13,14 @@ import time
 
 class ProcessNode():
     def __init__(self, appNetworkConfig, processName):
+        """
+        Instantiates pub and sub by composition using the path to the network configuration
+        file and the process name, which is the second argument passed in each process by design.
+        When constructed, this will pause for one second because it takes some time for the
+        ZeroMQ sockets to initially.  Further investigation should be done to see if a 
+        non-static wait can be used, since any static value might vary depending on the
+        circumstances.
+        """
         self.publisher = zeroMQInterface.ZeroMQPublisher()
         self.publisher.importProcessConfig(os.path.join(scriptDir,appNetworkConfig), processName)
 
@@ -33,10 +41,28 @@ class ProcessNode():
 
 
     def send(self, topic, message):
+        """
+        Wrapper for publisher send method.
+        :param topic: topic of the message to send
+        :type topic: str 
+        :param message: dictionary to be sent.  string also work.
+        :type message: dict 
+        """
         self.publisher.send(topic, message)
 
     def receive(self):
+        """
+        Wrapper for subscriber read
+        :returns: list of nested dictionaries
+        """
         return self.subscriber.receive()
 
     def log(self, logLevel, message):
+        """
+        Wrapper to send logs to subscribers
+        :param logLevel: the logging priority level of the message
+        :type logLevel: int
+        :param message: the log message to be sent
+        :type message: str
+        """
         self.publisher.send('log', self.logAdapter.genLogMessage(logLevel, message))
