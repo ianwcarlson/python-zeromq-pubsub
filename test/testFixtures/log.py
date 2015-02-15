@@ -19,3 +19,5 @@ logger.setLogConfig(os.path.join(scriptDir,'logs','testLog'))
 time.sleep(0)
 logger.run()
 
+print ('logger done processing')
+

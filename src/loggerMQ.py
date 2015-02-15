@@ -23,9 +23,6 @@ class Logger():
         :type logFileName: str
         """
         self.processNode = processNode.ProcessNode(appNetworkConfig, logProcessName)
-        #self.setLogConfig(logFileName)
-
-
 
     def run(self):
         """
@@ -34,7 +31,6 @@ class Logger():
         done = False
         while(not(done)):
             responseListDict = self.processNode.receive()
-            #print ('responseDict: ', responseListDict)
             for itemDict in responseListDict:
                 if (itemDict['topic']=='proc'):
                     if (itemDict['contents']['action'] == 'stop'):
