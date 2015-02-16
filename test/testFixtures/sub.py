@@ -6,29 +6,24 @@
 import os
 import sys
 scriptDir=os.path.dirname(os.path.realpath(__file__))
-import appNetworkConfig
+import testConstants
 sys.path.append(os.path.join(scriptDir,'..','..','src'))
-import zeroMQInterface
+import processNode
 import time
 import pdb
-import loggerMQ
+import loggerNode
+import logMessageAdapter
 
-subscriber = zeroMQInterface.ZeroMQSubscriber()
-subscriber.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
+processNodeObj = processNode.ProcessNode('appNetworkConfig3.py', sys.argv[1])
 
-publisher = zeroMQInterface.ZeroMQPublisher()
-publisher.importProcessConfig(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
-
-logAdapter = loggerMQ.LogMessageAdapter(sys.argv[1])
-
-time.sleep(0.001)
-while(True):
-	response = subscriber.receive()
+done = False
+while(not(done)):
+	response = processNodeObj.receive()
 	for item in response:
-		publisher.send('log', logAdapter.genLogMessage(logLevel=1, message=item))
-		if (response[0]['contents']['count'] >= appNetworkConfig.NUM_TEST_MSGS):
-			publisher.send('proc', {'action': 'stop'})
+		processNodeObj.log(logLevel=0, message=item)
+		if (response[0]['contents']['count'] >= testConstants.NUM_TEST_MSGS):
+			processNodeObj.log(logLevel=1, message='Done processing')
+			processNodeObj.send('proc', {'action': 'stop'})
+			done = True
 			break
 
-	
-	#time.sleep(0.0001)

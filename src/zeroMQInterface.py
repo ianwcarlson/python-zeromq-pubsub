@@ -15,10 +15,12 @@ import msgpack
 import importlib
 import pdb
 import utils
+import logMessageAdapter
+import time
 PUB_BUFF_SIZE = 100000
 
 # static functions
-def _extractProcessConfig(processList, processPath):
+def _extractProcessConfig(processList, processName):
     """
     Tries to find specific process dictionary settings at supplied
     process path.
@@ -29,7 +31,7 @@ def _extractProcessConfig(processList, processPath):
     """
     processDict = {}
     for process in processList:
-        if ('processName' in process and process['processName'] == processPath):
+        if ('processName' in process and process['processName'] == processName):
             processDict = process
             break
     
@@ -37,6 +39,26 @@ def _extractProcessConfig(processList, processPath):
         raise ValueError("Process configuration not found in config file")
 
     return processDict
+
+def _extractConfig(configFilePath, publisherName):
+    """
+    Extracts the endpoint address and the dictionary that contains other connection
+    information
+    :param configFilePath: path to the network configuration file
+    :type configFilePath: str 
+    :param publisherName: name of publisher
+    :type publisherName: str
+    :returns: endPointAddress (str), processConfigDict (dict)
+    """
+    processList = utils.separatePathAndModule(configFilePath)
+    processConfigDict = _extractProcessConfig(processList, publisherName)
+
+    if ('endPoint' in processConfigDict):
+        endPointAddress = processConfigDict['endPoint']
+    else:
+        raise ValueError("'endPoint' missing from process config")
+
+    return endPointAddress, processConfigDict
 
 class ZeroMQPublisher():
     def __init__(self, endPointAddress=None):
@@ -49,8 +71,7 @@ class ZeroMQPublisher():
         self.publisher = self.context.socket(zmq.PUB)
         self.publisher.set_hwm(PUB_BUFF_SIZE)
         if (endPointAddress is not(None)):
-            self.endPointAddress = endPointAddress
-            self.publisher.bind(endPointAddress)
+            self.bind(endPointAddress)
 
     def __del__(self):
         """
@@ -59,7 +80,17 @@ class ZeroMQPublisher():
         self.publisher.close()
         self.context.term()
 
-    def importProcessConfig(self, configFilePath, publisherName=utils.getModuleName(os.path.realpath(__file__))):
+    def bind(self, endPointAddress):
+        """
+        Binds the publisher to the endpoint address
+        :param endPointAddress: endpoint address (e.g., 'tcp://127.0.0.1:5555')
+        :type endPointAddress: str 
+        """
+        self.endPointAddress = endPointAddress
+        self.publisher.bind(endPointAddress)
+
+    def importProcessConfig(self, configFilePath, 
+        publisherName=utils.getModuleName(os.path.realpath(__file__))):
         """
         Registers publisher settings based off config file
         :param configFilePath: full config file path
@@ -68,16 +99,18 @@ class ZeroMQPublisher():
         :type publisherPath: str
         :raises: ValueError    
         """
+        self.endPointAddress, self.processConfigDict = _extractConfig(configFilePath, 
+            publisherName)
+        self.bind(self.endPointAddress)
+        self.publisherName = publisherName
+        self.logAdapter = logMessageAdapter.LogMessageAdapter(publisherName)
 
-        self.processList = utils.separatePathAndModule(configFilePath)
-        self.processConfigDict = _extractProcessConfig(self.processList, publisherName)
-
-        if ('endPoint' in self.processConfigDict):
-            self.endPointAddress = self.processConfigDict['endPoint']
-            self.publisher.bind(self.endPointAddress)
-            print (publisherName + ' binding to address ' + str(self.endPointAddress))
-        else:
-            raise ValueError("'endPoint' missing from process config")
+    def logPubConnections(self):
+        """
+        Method that logs the publisher connection information
+        """
+        logMsg = 'Binding to address ' + str(self.endPointAddress)
+        self.send('log', self.logAdapter.genLogMessage(logLevel=1, message=logMsg))
 
     def send(self, topic, dict):
         """
@@ -94,7 +127,7 @@ class ZeroMQPublisher():
 
 
 class ZeroMQSubscriber():
-    def __init__(self):
+    def __init__(self, publisherRef=None):
         """
         Constructor.  Sets up ZeroMQ subscriber socket and poller object
         :return:
@@ -102,43 +135,52 @@ class ZeroMQSubscriber():
         self.context = zmq.Context()
         self.subscriberList = []
         self.poller = zmq.Poller()
+        if (publisherRef is not(None)):
+            self.logPublisher = publisherRef
 
     def __del__(self):
         """
         Destructor.  Closes ZeroMQ connections.
         """
         for item in self.subscriberList:
-            item.close()
+            item['socket'].close()
 
         self.context.term()
+
+    def setPublisherRef(self, publisherRef):
+        """
+        Sets the publisher handle so this class can publish log messages
+        :param publisherRef: publisher handle (passed by reference)
+        :type: ZeroMQPublisher()
+        """
+        self.logPublisher = publisherRef
 
     def importProcessConfig(self, configFilePath, subscriberName=utils.getModuleName(os.path.realpath(__file__))):
         """
         Registers subscriber settings based off config file
         :param configFilePath: full config file path
         :type configFilePath: str
-        :param subscriberPath: path to subscriber process file (defaults to current file)
-        :type subscriberPath: str
+        :param subscriberName: path to subscriber process file (defaults to current file)
+        :type subscriberName: str
         :raises: ValueError    
         """
-        self.processList = utils.separatePathAndModule(configFilePath)
-        self.processConfigDict = _extractProcessConfig(self.processList, subscriberName)
+        logMsgsList = []
+        self.subscriberName = subscriberName
+        self.endPointAddress, self.processConfigDict = _extractConfig(configFilePath, 
+            subscriberName)
+        self.logAdapter = logMessageAdapter.LogMessageAdapter(subscriberName)
 
         if ('subscriptions' in self.processConfigDict):
             for subDict in self.processConfigDict['subscriptions']:
                 if ('endPoint' in subDict):
                     self.connectSubscriber(subDict['endPoint'])
-                    print ('connecting ' + subscriberName + ' to ' + str(subDict['endPoint']))
                     if ('topics' in subDict):
                         for topic in subDict['topics']:
                             self.subscribeToTopic(topic)
-                            print('subscribing to topic ' + str(topic))
                     else:
-                        print('Warning: No topics found for subscribed endpoint: ' + str(subDict['endPoint']))
+                        print('Warning: No topics found for subscribed endpoint: ')
                 else:
                     raise ValueError("No endpoint specified in process config")
-        else:
-            raise ValueError("No subscriptions specified in process config")
 
     def connectSubscriber(self, endPointAddress):
         """
@@ -146,9 +188,10 @@ class ZeroMQSubscriber():
         :param number port: integer representing the port number of the publisher to connect to
         :param str topic: string that is used to filter unwanted messages from publisher
         """
-        self.subscriberList.append(self.context.socket(zmq.SUB))
-        self.subscriberList[-1].connect(endPointAddress)
-        self.poller.register(self.subscriberList[-1], zmq.POLLIN)
+        self.subscriberList.append({'endPoint': endPointAddress, 
+            'socket': self.context.socket(zmq.SUB), 'topics': []})
+        self.subscriberList[-1]['socket'].connect(endPointAddress)
+        self.poller.register(self.subscriberList[-1]['socket'], zmq.POLLIN)
 
     def subscribeToTopic(self, topic):
         """
@@ -156,9 +199,29 @@ class ZeroMQSubscriber():
         :param topic: topic to subscriber to (filters other topics if not subscribed)
         :type topic: str
         """
-        self.subscriberList[-1].setsockopt(zmq.SUBSCRIBE, str.encode(topic))
+        self.subscriberList[-1]['topics'].append(topic)
+        self.subscriberList[-1]['socket'].setsockopt(zmq.SUBSCRIBE, str.encode(topic))
+
+    def logSubConnections(self):
+        """
+        Method that logs the connections list. 
+        """
+        for sub in self.subscriberList:
+            
+            topicStr = ''
+            for topic in sub['topics']:
+                topicStr += str(topic) + ' '
+            
+            logMsg = 'Connected to ' + sub['endPoint'] + \
+                ' under the following topics: ' + topicStr
+            self.logPublisher.send('log', self.logAdapter.genLogMessage(logLevel=1, message=logMsg))  
 
     def _byteToString(self, inBytes):
+        """
+        Converts bytes to string if needed
+        :param inBytes: input bytes
+        :type inBytes: bytes
+        """
         if (type(inBytes)==bytes):
             return inBytes.decode()
         else:
@@ -197,8 +260,8 @@ class ZeroMQSubscriber():
         responseList = []
         if (len(socks)>0):
             for listItem in self.subscriberList:
-                if listItem in socks:
-                    topic, pubAddress, contents = listItem.recv_multipart()
+                if listItem['socket'] in socks:
+                    topic, pubAddress, contents = listItem['socket'].recv_multipart()
 
                     convertedContents = self._convert_keys_to_string(msgpack.loads(contents)) 
                     responseList.append({

@@ -14,8 +14,6 @@ sys.path.append(scriptDir)
 sys.path.append(os.path.join(scriptDir,'..','src'))
 import zeroMQInterface
 import processManager
-sys.path.append(os.path.join(scriptDir,'testFixtures'))
-import appNetworkConfig
 
 
 class StatusPrinter():
@@ -35,19 +33,9 @@ class StatusPrinter():
 class TestZeroMQInterface(unittest.TestCase):
 	def setUp(self):
 		self.processManager = processManager.ProcessManager()
-		#newProcess = {
-		#	'processName': os.path.join(scriptDir,'testFixtures','pub.py'),
-		#	'endPoint': appNetworkConfig.PUB_ENDPOINT_ADDR
-		#}
-		#self.processManager.addProcess(newProcess)
-		#newProcess = {
-		#	'processName': os.path.join(scriptDir,'testFixtures','sub.py'),
-		#	'endPoint': appNetworkConfig.SUB_ENDPOINT_ADDR
-		#}
+
 		self.subscriber = zeroMQInterface.ZeroMQSubscriber()
 		self.configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig2.py')
-		#self.subscriber.connectSubscriber(appNetworkConfig.PUB_ENDPOINT_ADDR)
-		#self.subscriber.subscribeToTopic('fancy')
 
 	def testImportProcessConfig(self):
 		configPath = self.configPath
@@ -55,9 +43,6 @@ class TestZeroMQInterface(unittest.TestCase):
 		self.subscriber.importProcessConfig(configPath, 'subscriber1')
 
 		configPath = os.path.join(scriptDir,'testFixtures','badNetworkConfig1.py')	
-		self.assertRaises(ValueError, self.subscriber.importProcessConfig, configPath, subPath)
-
-		configPath = os.path.join(scriptDir,'testFixtures','badNetworkConfig2.py')	
 		self.assertRaises(ValueError, self.subscriber.importProcessConfig, configPath, subPath)
 
 		configPath = os.path.join(scriptDir,'testFixtures','badNetworkConfig3.py')	
@@ -73,14 +58,12 @@ class TestZeroMQInterface(unittest.TestCase):
 		badPubPath = os.path.join(scriptDir,'testFixtures','pub5.py')
 		self.assertRaises(ValueError, self.publisher.importProcessConfig, configPath, badPubPath)
 
-
-	def testSendBasicMessage(self):
+	def _testSendBasicMessage(self):
 		#self.processManager.importProcessConfig(self.configPath)
 		subprocess.Popen([
 			'python3', os.path.join(scriptDir,'testFixtures','pub.py'), 'publisher'],
 			stdout=True)
 		self.subscriber.importProcessConfig(self.configPath, 'subscriber2')
-
 
 		time.sleep(4)
 		count = 0

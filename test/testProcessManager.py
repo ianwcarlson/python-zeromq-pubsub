@@ -20,7 +20,7 @@ class TestProcessManager(unittest.TestCase):
 
 	def _add_known_good_process1(self):
 		newProcess = {
-			'processName': os.path.join(scriptDir,'testFixtures','process1.py'),
+			'processPath': os.path.join(scriptDir,'testFixtures','process1.py'),
 			'endPoint': 'tcp://127.0.0.1:5556'
 		}
 		self.processManager.addProcess(newProcess)
@@ -28,7 +28,7 @@ class TestProcessManager(unittest.TestCase):
 
 	def _add_known_good_process2(self):
 		newProcess = {
-			'processName': os.path.join(scriptDir,'testFixtures','process2.py'),
+			'processPath': os.path.join(scriptDir,'testFixtures','process2.py'),
 			'endPoint': 'tcp://127.0.0.1:5557'
 		}
 		self.processManager.addProcess(newProcess)
@@ -44,12 +44,12 @@ class TestProcessManager(unittest.TestCase):
 
 	def test_add_bad_process(self):
 		newProcess = {
-			'processme': os.path.join(scriptDir,'testFixtures','process1.py'),
-			'endint': 'tcp://127.0.0.1:5556'
+			'processame': os.path.join(scriptDir,'testFixtures','process1.py'),
+			'endPnt': 'tcp://127.0.0.1:5556'
 		}
 		self.assertRaises(ValueError, self.processManager.addProcess, newProcess)
 
-	def test_smoke_run(self):
+	def _test_smoke_run(self):
 		self._add_known_good_process1()
 		self._add_known_good_process2()
 		self.processManager.run()
