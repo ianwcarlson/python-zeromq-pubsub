@@ -57,9 +57,8 @@ class ProcessManager():
         :type fullConfigPath: str
         :raises: ValueError
         """
-        processList = utils.separatePathAndModule(fullConfigPath)
-        if (len(processList) == 0):
-            raise ValueError("No processes were found in config file")
+        masterProcessConfig = utils.importConfigJson(fullConfigPath)
+        processList = masterProcessConfig['processList']
 
         for process in processList:
             if ('processPath' in process):

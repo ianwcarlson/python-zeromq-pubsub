@@ -5,6 +5,7 @@
 import os
 import sys
 import importlib
+import json
 
 def separatePathAndModule(fullPath):
     """
@@ -16,7 +17,6 @@ def separatePathAndModule(fullPath):
     :raises: ValueError
     """
     processList = []
-
     try:
         moduleName, path = getModuleName(fullPath)
         sys.path.append(path)
@@ -26,6 +26,26 @@ def separatePathAndModule(fullPath):
         raise ValueError("Unable to import module at specified path")
 
     return processList
+
+def importConfigJson(fullPath):
+    """
+    """
+    configDict = {}
+    try:
+        file = open(fullPath, 'r')
+        fileStr = file.read()
+        configDict = json.loads(fileStr)
+    except:
+        raise UnicodeDecodeError('Unable to open and import json file')
+
+    if ('processList' not in processConfig or 
+        'endPointsIds' not in processConfig):
+        raise ValueError("'processList' or 'endPointIds' keys not found in config")
+
+    if (len(processConfig['processList']) == 0):
+        raise ValueError("'processList' empty")
+
+    return configDict
 
 def getModuleName(fullPath):
     path, fileName = os.path.split(fullPath)

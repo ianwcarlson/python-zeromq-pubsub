@@ -50,11 +50,17 @@ def _extractConfig(configFilePath, publisherName):
     :type publisherName: str
     :returns: endPointAddress (str), processConfigDict (dict)
     """
-    processList = utils.separatePathAndModule(configFilePath)
-    processConfigDict = _extractProcessConfig(processList, publisherName)
+    masterProcessConfig = utils.importConfigJson(configFilePath)
+    processConfigDict = _extractProcessConfig(masterProcessConfig['processList'], 
+        publisherName)
+    endPointIds = masterProcessConfig['endPointIds']
 
     if ('endPoint' in processConfigDict):
-        endPointAddress = processConfigDict['endPoint']
+        endPointID = processConfigDict['endPoint']
+        if (endPointID in endPointIds):
+            endPointAddress = endPointIds[endPointID]
+        else:
+            raise ValueError("can't match 'endPoint' in 'endPointIds'")
     else:
         raise ValueError("'endPoint' missing from process config")
 
