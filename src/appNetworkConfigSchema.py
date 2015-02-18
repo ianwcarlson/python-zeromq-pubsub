@@ -1,4 +1,4 @@
-{
+schema = {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "http://jsonschema.net",
   "type": "object",
@@ -70,8 +70,10 @@
             }
           }
         },
+        "additionalProperties": False,
         "required": ["processName", "processPath", "endPoint"]
-      }
+      },
+      "additionalItems" : False
     }
   },
   "required": [

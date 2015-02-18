@@ -1,0 +1,49 @@
+{
+    "Ids" : [
+        {
+            "id" : "K9_IF_ADDR",
+            "address" : "tcp://127.0.0.1:5556"
+        },
+        {
+            "id" : "DB_IF_ADDR",
+            "address" : "tcp://127.0.0.1:5557"
+        },
+        {
+            "id" : "LOG_ADDR",
+            "address" : "tcp://127.0.0.1:5558"
+        }
+    ],    
+    "p" : [
+        {
+            "processName": "Log",
+            "processPath": "logger.py",
+            "endPoint": "LOG_ADDR",
+            "subscriptions": [
+                {
+                    "endPoint": "K9_IF_ADDR",
+                    "topics": ["log", "proc"]
+                },
+                {
+                    "endPoint": "DB_IF_ADDR",
+                    "topics": ["log", "proc"]
+                }
+            ]
+        },
+        {
+            "processName": "K9 Interface",
+            "processPath": "fileToK9DatRunner.py",
+            "endPoint": "K9_IF_ADDR"
+        },
+        {
+            "processName": "Database",
+            "processPath": "sqliteDBInterface.py",
+            "endPoint": "DB_IF_ADDR",
+            "subscriptions": [
+            	{
+            		"endPoint": "K9_IF_ADDR",
+            		"topics" : ["iq", "gprmc"]
+            	}
+            ]
+        }
+    ]
+}
