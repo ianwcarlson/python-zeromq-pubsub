@@ -6,7 +6,6 @@
 import os
 import sys
 scriptDir=os.path.dirname(os.path.realpath(__file__))
-import appNetworkConfig2
 sys.path.append(os.path.join(scriptDir,'..','..','src'))
 import loggerNode
 import time
