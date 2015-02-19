@@ -37,7 +37,7 @@ class TestZeroMQInterface(unittest.TestCase):
 		self.subscriber = zeroMQInterface.ZeroMQSubscriber()
 		self.configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig2.py')
 
-	def testImportProcessConfig(self):
+	def _testImportProcessConfig(self):
 		configPath = self.configPath
 		subPath = os.path.join(scriptDir,'testFixtures','sub.py')
 		self.subscriber.importProcessConfig(configPath, 'subscriber1')
@@ -59,7 +59,6 @@ class TestZeroMQInterface(unittest.TestCase):
 		self.assertRaises(ValueError, self.publisher.importProcessConfig, configPath, badPubPath)
 
 	def _testSendBasicMessage(self):
-		#self.processManager.importProcessConfig(self.configPath)
 		subprocess.Popen([
 			'python3', os.path.join(scriptDir,'testFixtures','pub.py'), 'publisher'],
 			stdout=True)

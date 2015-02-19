@@ -1,0 +1,45 @@
+{
+    "endPointsIds" : [
+        {
+            "id" : "PUB_ENDPOINT_ADDR",
+            "address" : "tcp://127.0.0.1:5556"
+        },
+        {
+            "id" : "SUB_ENDPOINT_ADDR",
+            "address" : "tcp://127.0.0.1:5557"
+        },
+        {
+            "id" : "TEST_SUB_ENDPOINT_ADDR",
+            "address" : "tcp://127.0.0.1:5558"
+        }
+    ],    
+    "processList" : [
+        {
+            "processName": "publisher",
+            "processPath": "/usr/local/test/testFixtures/pub.py",
+            "endPoint": "PUB_ENDPOINT_ADDR"
+        },
+        {
+            "processName": "subscriber1",
+            "processPath": "/usr/local/test/testFixtures/sub.py",
+            "endPoint": "SUB_ENDPOINT_ADDR",
+            "subscriptions": [
+                {
+                    "endPoint": "PUB_ENDPOINT_ADDR",
+                    "topics" : ["fancy"]
+                }
+            ]
+        },
+        {
+            "processName": "subscriber2",
+            "processPath": "/usr/local/test/testZeroMQInterface.py",
+            "endPoint": "TEST_SUB_ENDPOINT_ADDR",
+            "subscriptions": [
+                {
+                    "endPoint": "PUB_ENDPOINT_ADDR",
+                    "topics" : ["fancy"]
+                }
+            ]
+        }
+    ]
+}

@@ -31,9 +31,10 @@ def _extractProcessConfig(processList, processName):
     """
     processDict = {}
     for process in processList:
-        #if ('processName' in process and process['processName'] == processName):
-        processDict = process
-        break
+
+        if (process['processName'] == processName):
+            processDict = process
+            break
     
     if (not(processDict)):
         raise ValueError("Process configuration not found in config file")
@@ -53,23 +54,25 @@ def _extractConfig(configFilePath, publisherName):
     masterProcessConfig = utils.importConfigJson(configFilePath)
     processConfigDict = _extractProcessConfig(masterProcessConfig['processList'], 
         publisherName)
-    endPointIdsDict = masterProcessConfig['endPointsIds']
+    endPointIdsList = masterProcessConfig['endPointsIds']
 
-    #if ('endPoint' in processConfigDict):
     endPointID = processConfigDict['endPoint']
-    print ('endPointIds: ' + str(endPointIdsDict))
-    print ('endPointID: ' + str(endPointID))
 
+    endPointAddress = _convertIDToAddress(endPointID, endPointIdsList)
+
+    return endPointAddress, processConfigDict, endPointIdsList
+
+def _convertIDToAddress(endPointID, endPointIdsList):
     endPointFound = False
-    for item in endPointIdsDict:
+    for item in endPointIdsList:
         if (item['id'] == endPointID):
-            endPointAddress = endPointIds[endPointID]
-    else:
-        raise ValueError("can't match 'endPoint' in 'endPointIds'")
-    #else:
-    #    raise ValueError("'endPoint' missing from process config")
+            endPointAddress = item['address']
+            endPointFound = True
 
-    return endPointAddress, processConfigDict
+    if (not(endPointFound)):
+        raise ValueError("can't match 'endPoint' in 'endPointIds'")
+
+    return endPointAddress
 
 class ZeroMQPublisher():
     def __init__(self, endPointAddress=None):
@@ -110,7 +113,7 @@ class ZeroMQPublisher():
         :type publisherPath: str
         :raises: ValueError    
         """
-        self.endPointAddress, self.processConfigDict = _extractConfig(configFilePath, 
+        self.endPointAddress, self.processConfigDict, endPointIdsList = _extractConfig(configFilePath, 
             publisherName)
         self.bind(self.endPointAddress)
         self.publisherName = publisherName
@@ -177,21 +180,15 @@ class ZeroMQSubscriber():
         """
         logMsgsList = []
         self.subscriberName = subscriberName
-        self.endPointAddress, self.processConfigDict = _extractConfig(configFilePath, 
+        self.endPointAddress, self.processConfigDict, endPointsIdsList = _extractConfig(configFilePath, 
             subscriberName)
         self.logAdapter = logMessageAdapter.LogMessageAdapter(subscriberName)
 
         if ('subscriptions' in self.processConfigDict):
             for subDict in self.processConfigDict['subscriptions']:
-                #if ('endPoint' in subDict):
-                self.connectSubscriber(subDict['endPoint'])
-                    #if ('topics' in subDict):
+                self.connectSubscriber(_convertIDToAddress(subDict['endPoint'], endPointsIdsList))
                 for topic in subDict['topics']:
                     self.subscribeToTopic(topic)
-                    #else:
-                    #    print('Warning: No topics found for subscribed endpoint: ')
-                #else:
-                #    raise ValueError("No endpoint specified in process config")
 
     def connectSubscriber(self, endPointAddress):
         """
