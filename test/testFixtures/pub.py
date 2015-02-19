@@ -14,7 +14,7 @@ import pdb
 import loggerNode
 import logMessageAdapter
 
-processNode = processNode.ProcessNode('appNetworkConfig3.py', sys.argv[1])
+processNode = processNode.ProcessNode(os.path.join(scriptDir,'appNetworkConfig3.json'), sys.argv[1])
 
 count = 0
 basicMsg = {'count': count}

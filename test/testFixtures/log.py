@@ -13,7 +13,7 @@ import time
 import pdb
 import time
 
-logger = loggerNode.Logger(os.path.join(scriptDir,'appNetworkConfig3.py'), sys.argv[1])
+logger = loggerNode.Logger(os.path.join(scriptDir,'appNetworkConfig3.json'), sys.argv[1])
 logger.setLogConfig(os.path.join(scriptDir,'logs','testLog'))
 
 time.sleep(0)

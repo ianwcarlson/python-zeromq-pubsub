@@ -66,7 +66,9 @@ schema = {
                     "type": "string"
                   }
                 }
-              }
+              },
+              "additionalProperties": False,
+              "required": ["endPoint", "topics"]
             }
           }
         },

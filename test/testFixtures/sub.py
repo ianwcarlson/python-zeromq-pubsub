@@ -14,7 +14,7 @@ import pdb
 import loggerNode
 import logMessageAdapter
 
-processNodeObj = processNode.ProcessNode('appNetworkConfig3.py', sys.argv[1])
+processNodeObj = processNode.ProcessNode(os.path.join(scriptDir,'appNetworkConfig3.json'), sys.argv[1])
 
 done = False
 while(not(done)):

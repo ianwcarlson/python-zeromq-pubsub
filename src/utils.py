@@ -6,6 +6,10 @@ import os
 import sys
 import importlib
 import json
+from jsonschema import Draft3Validator
+scriptDir=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(scriptDir)
+import appNetworkConfigSchema
 
 def separatePathAndModule(fullPath):
     """
@@ -29,21 +33,23 @@ def separatePathAndModule(fullPath):
 
 def importConfigJson(fullPath):
     """
+    Reads JSON formatted master configuration file
+    :param fullPath: full path of the JSON file to load
+    :type fullPath: str
+    :raises: jsonschema.exceptions.ValidationError
+    :returns: dictionary of master configuration information
     """
     configDict = {}
-    try:
-        file = open(fullPath, 'r')
-        fileStr = file.read()
-        configDict = json.loads(fileStr)
-    except:
-        raise UnicodeDecodeError('Unable to open and import json file')
 
-    if ('processList' not in processConfig or 
-        'endPointsIds' not in processConfig):
-        raise ValueError("'processList' or 'endPointIds' keys not found in config")
+    file = open(fullPath, 'r')
 
-    if (len(processConfig['processList']) == 0):
-        raise ValueError("'processList' empty")
+    configDict = json.loads(file.read())
+    validator = Draft3Validator(appNetworkConfigSchema.schema)
+    
+    # this will raise jsonschema.exceptions.ValidationError exception
+    validator.validate(configDict)
+
+    file.close()
 
     return configDict
 

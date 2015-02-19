@@ -23,9 +23,13 @@ logsDir = os.path.join(scriptDir,'testFixtures','logs')
 
 class TestZeroLoggerMQ(unittest.TestCase):
 	def setUp(self):
-		shutil.rmtree(logsDir)
+		try:
+			shutil.rmtree(logsDir)
+		except:
+			print('')
+			
 		self.processManager = processManager.ProcessManager()	
-		self.processManager.importProcessConfig(os.path.join(scriptDir,'testFixtures','appNetworkConfig3.py'))
+		self.processManager.importProcessConfig(os.path.join(scriptDir,'testFixtures','appNetworkConfig3.json'))
 
 	def testProcessManager(self):
 		self.processManager.run()

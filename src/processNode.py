@@ -21,6 +21,7 @@ class ProcessNode():
         non-static wait can be used, since any static value might vary depending on the
         circumstances.
         """
+        print ("IMPORT CONFIG: " + str(appNetworkConfig))
         self.publisher = zeroMQInterface.ZeroMQPublisher()
         self.publisher.importProcessConfig(os.path.join(scriptDir,appNetworkConfig), processName)
 

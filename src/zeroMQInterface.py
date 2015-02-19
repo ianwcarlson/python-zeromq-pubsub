@@ -31,9 +31,9 @@ def _extractProcessConfig(processList, processName):
     """
     processDict = {}
     for process in processList:
-        if ('processName' in process and process['processName'] == processName):
-            processDict = process
-            break
+        #if ('processName' in process and process['processName'] == processName):
+        processDict = process
+        break
     
     if (not(processDict)):
         raise ValueError("Process configuration not found in config file")
@@ -53,16 +53,21 @@ def _extractConfig(configFilePath, publisherName):
     masterProcessConfig = utils.importConfigJson(configFilePath)
     processConfigDict = _extractProcessConfig(masterProcessConfig['processList'], 
         publisherName)
-    endPointIds = masterProcessConfig['endPointIds']
+    endPointIdsDict = masterProcessConfig['endPointsIds']
 
-    if ('endPoint' in processConfigDict):
-        endPointID = processConfigDict['endPoint']
-        if (endPointID in endPointIds):
+    #if ('endPoint' in processConfigDict):
+    endPointID = processConfigDict['endPoint']
+    print ('endPointIds: ' + str(endPointIdsDict))
+    print ('endPointID: ' + str(endPointID))
+
+    endPointFound = False
+    for item in endPointIdsDict:
+        if (item['id'] == endPointID):
             endPointAddress = endPointIds[endPointID]
-        else:
-            raise ValueError("can't match 'endPoint' in 'endPointIds'")
     else:
-        raise ValueError("'endPoint' missing from process config")
+        raise ValueError("can't match 'endPoint' in 'endPointIds'")
+    #else:
+    #    raise ValueError("'endPoint' missing from process config")
 
     return endPointAddress, processConfigDict
 
@@ -178,15 +183,15 @@ class ZeroMQSubscriber():
 
         if ('subscriptions' in self.processConfigDict):
             for subDict in self.processConfigDict['subscriptions']:
-                if ('endPoint' in subDict):
-                    self.connectSubscriber(subDict['endPoint'])
-                    if ('topics' in subDict):
-                        for topic in subDict['topics']:
-                            self.subscribeToTopic(topic)
-                    else:
-                        print('Warning: No topics found for subscribed endpoint: ')
-                else:
-                    raise ValueError("No endpoint specified in process config")
+                #if ('endPoint' in subDict):
+                self.connectSubscriber(subDict['endPoint'])
+                    #if ('topics' in subDict):
+                for topic in subDict['topics']:
+                    self.subscribeToTopic(topic)
+                    #else:
+                    #    print('Warning: No topics found for subscribed endpoint: ')
+                #else:
+                #    raise ValueError("No endpoint specified in process config")
 
     def connectSubscriber(self, endPointAddress):
         """

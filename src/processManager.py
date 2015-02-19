@@ -61,10 +61,10 @@ class ProcessManager():
         processList = masterProcessConfig['processList']
 
         for process in processList:
-            if ('processPath' in process):
-                self.processInputList.append(process)
-            else:
-                raise ValueError("'processPath' not provided in config file")
+            #if ('processPath' in process):
+            self.processInputList.append(process)
+            #else:
+            #    raise ValueError("'processPath' not provided in config file")
         
     def run(self):
         """
