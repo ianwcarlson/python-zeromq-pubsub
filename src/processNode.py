@@ -12,7 +12,7 @@ import logMessageAdapter
 import time
 
 class ProcessNode():
-    def __init__(self, appNetworkConfig, processName):
+    def __init__(self, appNetworkConfig, processName, minLogLevel=0):
         """
         Instantiates pub and sub by composition using the path to the network configuration
         file and the process name, which is the second argument passed in each process by design.
@@ -31,6 +31,7 @@ class ProcessNode():
         self.subscriber.setPublisherRef(self.publisher)
         self.subscriber.importProcessConfig(os.path.join(scriptDir,appNetworkConfig), processName)
 
+        self.minLogLevel = minLogLevel
         self.logAdapter = logMessageAdapter.LogMessageAdapter(processName)
 
         # need to wait until zeroMQ socket connections establish, otherwise
@@ -66,4 +67,5 @@ class ProcessNode():
         :param message: the log message to be sent
         :type message: str
         """
-        self.publisher.send('log', self.logAdapter.genLogMessage(logLevel, message))
+        if (logLevel >= self.minLogLevel):
+            self.publisher.send('log', self.logAdapter.genLogMessage(logLevel, message))
