@@ -58,21 +58,9 @@ def _extractConfig(configFilePath, publisherName):
 
     endPointID = processConfigDict['endPoint']
 
-    endPointAddress = _convertIDToAddress(endPointID, endPointIdsList)
+    endPointAddress = utils._convertIDToAddress(endPointID, endPointIdsList)
 
     return endPointAddress, processConfigDict, endPointIdsList
-
-def _convertIDToAddress(endPointID, endPointIdsList):
-    endPointFound = False
-    for item in endPointIdsList:
-        if (item['id'] == endPointID):
-            endPointAddress = item['address']
-            endPointFound = True
-
-    if (not(endPointFound)):
-        raise ValueError("can't match 'endPoint' in 'endPointIds'")
-
-    return endPointAddress
 
 class ZeroMQPublisher():
     def __init__(self, endPointAddress=None):
@@ -186,7 +174,7 @@ class ZeroMQSubscriber():
 
         if ('subscriptions' in self.processConfigDict):
             for subDict in self.processConfigDict['subscriptions']:
-                self.connectSubscriber(_convertIDToAddress(subDict['endPoint'], endPointsIdsList))
+                self.connectSubscriber(utils._convertIDToAddress(subDict['endPoint'], endPointsIdsList))
                 for topic in subDict['topics']:
                     self.subscribeToTopic(topic)
 

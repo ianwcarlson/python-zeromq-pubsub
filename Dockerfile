@@ -9,7 +9,8 @@ RUN apt-get update
 RUN apt-get install -y python3 libzmq3 python3-zmq python3-pip
 RUN mkdir -p $SRC_DIR/
 
-RUN pip3 install msgpack-python nose jsonschema
+RUN pip3 install msgpack-python nose
+RUN pip3 install jsonschema
 
 
 

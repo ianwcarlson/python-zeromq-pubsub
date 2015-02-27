@@ -81,4 +81,20 @@ def convLogLevelNumToString(logLevelNum):
     else:
         numString = 'Log Level unrecognized'
 
-    return numString    
+    return numString   
+
+def _convertIDToAddress(endPointID, endPointIdsList):
+    endPointFound = False
+    for item in endPointIdsList:
+        if (item['id'] == endPointID):
+            endPointAddress = item['address']
+            endPointFound = True
+
+    if (not(endPointFound)):
+        raise ValueError("can't match 'endPoint' in 'endPointIds'")
+
+    return endPointAddress 
+
+def getHostIP():
+    import socket
+    return socket.gethostbyname(socket.gethostname())
