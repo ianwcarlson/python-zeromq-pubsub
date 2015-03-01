@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="Trckr">
+	<trk>
+		<name>February 28, 2015 at 7:26:53 PM MST</name>
+		<trkseg>
+			<trkpt lat="35.124270" lon="-106.597446">
+				<ele>1571.554199</ele>
+				<time>2015-03-01T02:26:53Z</time>
+			</trkpt>
+			<trkpt lat="35.124401" lon="-106.597411">
+				<ele>1571.543213</ele>
+				<time>2015-03-01T02:26:55Z</time>
+			</trkpt>
+			<trkpt lat="35.124247" lon="-106.597221">
+				<ele>1575.158094</ele>
+				<time>2015-03-01T02:26:55Z</time>
+			</trkpt>
+			<trkpt lat="35.124245" lon="-106.597220">
+				<ele>1575.227430</ele>
+				<time>2015-03-01T02:26:56Z</time>
+			</trkpt>
+			<trkpt lat="35.124245" lon="-106.597220">
+				<ele>1571.930067</ele>
+				<time>2015-03-01T02:27:03Z</time>
+			</trkpt>
+			<trkpt lat="35.124263" lon="-106.597255">
+				<ele>1571.936144</ele>
+				<time>2015-03-01T02:27:07Z</time>
+			</trkpt>
+			<trkpt lat="35.124263" lon="-106.597255">
+				<ele>1572.661572</ele>
+				<time>2015-03-01T02:27:10Z</time>
+			</trkpt>
+			<trkpt lat="35.124282" lon="-106.597306">
+				<ele>1573.208394</ele>
+				<time>2015-03-01T02:27:12Z</time>
+			</trkpt>
+		</trkseg>
+	</trk>
+</gpx>
