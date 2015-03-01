@@ -24,7 +24,7 @@
     "processList" : [
         {
             "processName": "log",
-            "processPath": "/usr/local/test/testFixtures/log.py",
+            "processPath": "/usr/local/examples/geofencing/log.py",
             "endPoint": "LOGGER_ENDPOINT_ADDR",
             "subscriptions": [
                 {
