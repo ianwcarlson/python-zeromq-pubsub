@@ -1,0 +1,11 @@
+{
+  "name": "geofence",
+  "version": "0.0.0",
+  "description": "Example real-time app that detects if current position is within user-specified bounds",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD-2-Clause"
+}

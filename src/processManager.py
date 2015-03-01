@@ -65,7 +65,20 @@ class ProcessManager():
             self.processInputList.append(process)
             #else:
             #    raise ValueError("'processPath' not provided in config file")
-        
+
+    def getInterpretor(self, processPath):
+        '''
+        Determines which interpretor to run
+        '''
+        interpretor = 'unknown'
+        fileName, fileExtension = os.path.splitext(processPath)
+        if (fileExtension == '.py'):
+            interpretor = 'python3'
+        elif (fileExtension == '.js'):
+            interpretor = 'nodejs'
+
+        return interpretor
+      
     def run(self):
         """
         Run all processes in process list.  This should evolve to be more responsive 
@@ -77,12 +90,13 @@ class ProcessManager():
         # start processes
         for idx in range(len(self.processInputList)):
             path = os.path.join(scriptDir,self.processInputList[idx]['processPath'])
+            interpretor = self.getInterpretor(path)
             print ('Starting process: ' + str(path) + ' ' + self.processInputList[idx]['processName'])
             self.processHandleList.append(subprocess.Popen([
-                'python3', path, self.processInputList[idx]['processName']], 
+                interpretor, path, self.processInputList[idx]['processName']], 
                 stdout=True))
 
-        # monitor processes to see if they're still aliveps
+        # monitor processes to see if they're still alive
         while(True):
             if (len(self.processHandleList) == 0):
                 break

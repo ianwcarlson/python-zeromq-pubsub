@@ -62,17 +62,21 @@
                 {
                     "endPoint": "GPS_IF_ENDPOINT_ADDR",
                     "topics" : ["proc", "gpsData"]
+                },
+                {
+                    "endPoint": "WEB_SERVER_ENDPOINT_ADDR",
+                    "topics" : ["proc", "newPolygonPoints"]
                 }
             ]
         },
         {
             "processName": "webServer",
-            "processPath": "/usr/local/examples/geofencing/webServer.py",
+            "processPath": "/usr/local/examples/geofencing/webServer/server.js",
             "endPoint": "WEB_SERVER_ENDPOINT_ADDR",
             "subscriptions": [
                 {
                     "endPoint": "DB_ENDPOINT_ADDR",
-                    "topics" : ["proc", "data"]
+                    "topics" : ["proc", "pointInPolygon", "gpsData"]
                 }
             ]
         },
