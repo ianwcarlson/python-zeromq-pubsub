@@ -14,11 +14,11 @@ sys.path.append(os.path.join(scriptDir,'..','..','src'))
 import processNode
 
 class PointInAPolygon():
-    def __init__(self, processName):
+    def __init__(self, processName, fullConfigPath):
         self.polygon = [(-33.416032,-70.593016), (-33.415370,-70.589604),
             (-33.417340,-70.589046), (-33.417949,-70.592351),
             (-33.416032,-70.593016)]
-        self.pointInPolygonNode = processNode.ProcessNode(os.path.join(scriptDir,'geofencingExampleConfig.json'), processName)
+        self.pointInPolygonNode = processNode.ProcessNode(fullConfigPath, processName)
 
     def run(self):
         """
@@ -76,5 +76,5 @@ class PointInAPolygon():
         return inside
 
 if __name__ == '__main__':
-    pointInAPolygon = PointInAPolygon(sys.argv[1])
+    pointInAPolygon = PointInAPolygon(sys.argv[1], sys.argv[2])
     pointInAPolygon.run()

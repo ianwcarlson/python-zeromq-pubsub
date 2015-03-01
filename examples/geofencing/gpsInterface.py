@@ -9,8 +9,8 @@ sys.path.append(os.path.join(scriptDir,'..','..','src'))
 import processNode
 
 class GpsInterface():
-	def __init__(self, processName):		
-		gpsInterfaceNode = processNode.ProcessNode(os.path.join(scriptDir,'geofencingExampleConfig.json'), processName)
+	def __init__(self, processName, fullConfigPath):		
+		gpsInterfaceNode = processNode.ProcessNode(fullConfigPath, processName)
 		inputFilePath = os.path.join(scriptDir, 'inputData/Track on 2015-03-01 at 15-30 MST.gpx')
 
 		gpx_file = open(inputFilePath, 'r')
@@ -32,4 +32,4 @@ class GpsInterface():
 
 
 if __name__ == '__main__':
-	gpsInterface = GpsInterface(sys.argv[1])
+	gpsInterface = GpsInterface(sys.argv[1], sys.argv[2])

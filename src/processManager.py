@@ -57,6 +57,7 @@ class ProcessManager():
         :type fullConfigPath: str
         :raises: ValueError
         """
+        self.fullConfigPath = fullConfigPath
         masterProcessConfig = utils.importConfigJson(fullConfigPath)
         processList = masterProcessConfig['processList']
 
@@ -66,18 +67,18 @@ class ProcessManager():
             #else:
             #    raise ValueError("'processPath' not provided in config file")
 
-    def getInterpretor(self, processPath):
+    def getInterpreter(self, processPath):
         '''
         Determines which interpretor to run
         '''
-        interpretor = 'unknown'
+        interpreter = 'unknown'
         fileName, fileExtension = os.path.splitext(processPath)
         if (fileExtension == '.py'):
-            interpretor = 'python3'
+            interpreter = 'python3'
         elif (fileExtension == '.js'):
-            interpretor = 'nodejs'
+            interpreter = 'node'
 
-        return interpretor
+        return interpreter
       
     def run(self):
         """
@@ -90,10 +91,10 @@ class ProcessManager():
         # start processes
         for idx in range(len(self.processInputList)):
             path = os.path.join(scriptDir,self.processInputList[idx]['processPath'])
-            interpretor = self.getInterpretor(path)
+            interpreter = self.getInterpretor(path)
             print ('Starting process: ' + str(path) + ' ' + self.processInputList[idx]['processName'])
             self.processHandleList.append(subprocess.Popen([
-                interpretor, path, self.processInputList[idx]['processName']], 
+                interpreter, path, self.processInputList[idx]['processName'], self.fullConfigPath], 
                 stdout=True))
 
         # monitor processes to see if they're still alive
