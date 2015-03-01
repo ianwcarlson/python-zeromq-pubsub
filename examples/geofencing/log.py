@@ -14,9 +14,5 @@ import time
 
 logger = loggerNode.Logger(os.path.join(scriptDir,'geofencingExampleConfig.json'), sys.argv[1])
 logger.setLogConfig(os.path.join(scriptDir,'logs','testLog'))
-
-time.sleep(0)
 logger.run()
-
-print ('logger done processing')
 
