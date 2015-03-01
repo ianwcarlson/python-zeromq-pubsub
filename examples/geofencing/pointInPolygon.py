@@ -41,9 +41,8 @@ class PointInAPolygon():
 
                     logMsg = 'Inside' if (isInside) else 'Outside'
                     self.pointInPolygonNode.log(logLevel=0, message=logMsg)
-  
-
-
+                elif(topic == 'newPolygonPoints'):
+                    self.polygon == itemDict['message']
 
     @staticmethod
     def pointInsidePolygon(x,y,poly):

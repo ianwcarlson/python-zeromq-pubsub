@@ -91,7 +91,7 @@ class ProcessManager():
         # start processes
         for idx in range(len(self.processInputList)):
             path = os.path.join(scriptDir,self.processInputList[idx]['processPath'])
-            interpreter = self.getInterpretor(path)
+            interpreter = self.getInterpreter(path)
             print ('Starting process: ' + str(path) + ' ' + self.processInputList[idx]['processName'])
             self.processHandleList.append(subprocess.Popen([
                 interpreter, path, self.processInputList[idx]['processName'], self.fullConfigPath], 
