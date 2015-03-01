@@ -28,6 +28,8 @@ class GpsInterface():
 						gpsInterfaceNode.log(logLevel=0, message=gpsDataMsg)
 						time.sleep(0.1)
 
+		gpsInterfaceNode.send('proc', {'action': 'stop'})
+
 
 if __name__ == '__main__':
 	gpsInterface = GpsInterface(sys.argv[1])

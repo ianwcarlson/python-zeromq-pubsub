@@ -58,6 +58,10 @@
                 {
                     "endPoint": "DB_ENDPOINT_ADDR",
                     "topics" : ["proc", "requestPolygon", "gpsData"]
+                },
+                {
+                    "endPoint": "GPS_IF_ENDPOINT_ADDR",
+                    "topics" : ["proc", "gpsData"]
                 }
             ]
         },
