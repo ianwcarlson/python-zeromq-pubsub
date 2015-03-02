@@ -52,7 +52,7 @@
 						timeout: 1000
 					},
 					shapeOptions: {
-						color: '#336600'
+						color: '#CC3300'
 					},
 					showArea: true
 				},
@@ -97,28 +97,18 @@
 			socket.emit('newPolygonPoints', latlngs);
 		}
 
+		function changeColorOfPolygon(newColor){
+			var elems = document.getElementsByTagName('path');
+			elems[0].setAttribute('stroke', newColor);
+			elems[0].setAttribute('fill', newColor);
+		}
+
 		socket.on('pointInPolygon', function(isPointInPolygon){
 			console.log('new is point in polygon: ', isPointInPolygon);
 			if (isPointInPolygon){
-				console.log('change color to green');
-				//drawControl.setDrawingOptions({
-				//	polygon: {
-				//		shapeOptions: {
-				//			color: '#336600'
-				//		}
-				//	}
-				//});
-				drawControl.options.draw.polygon.shapeOptions.color = '#336600';
+				changeColorOfPolygon('#336600');
 			} else {
-				console.log('change color to red');
-				//drawControl.setDrawingOptions({
-				//	polygon: {
-				//		shapeOptions: {
-				//			color: '#CC3300'
-				//		}
-				//	}
-				//});
-				drawControl.options.draw.polygon.shapeOptions.color = '#CC3300';		
+				changeColorOfPolygon('#CC3300');		
 			}
 		});
 		

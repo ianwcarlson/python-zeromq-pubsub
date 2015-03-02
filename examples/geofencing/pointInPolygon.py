@@ -45,7 +45,6 @@ class PointInAPolygon():
                 elif(topic == 'newPolygonPoints'):
                     self.pointInPolygonNode.log(logLevel=0, message=itemDict['contents'])
                     listOfTuples = self.convertDictsToTuples(itemDict['contents'])
-                    #print ('LISTOFTUPLES!!!: ' + str(listOfTuples))
                     self.polygon = listOfTuples
 
     @staticmethod
