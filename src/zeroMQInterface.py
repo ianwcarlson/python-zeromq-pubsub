@@ -114,7 +114,7 @@ class ZeroMQPublisher():
         logMsg = 'Binding to address ' + str(self.endPointAddress)
         self.send('log', self.logAdapter.genLogMessage(logLevel=1, message=logMsg))
 
-    def send(self, topic, dict):
+    def send(self, topic, inDict):
         """
         Main send function over ZeroMQ socket.  Input dictionary gets
         serialized and sent over wire.
@@ -123,9 +123,14 @@ class ZeroMQPublisher():
         :param dictionary dict: data payload input
         """
 
-        serialDict = msgpack.dumps(dict)
-        self.publisher.send_multipart([str.encode(topic),str.encode(self.endPointAddress),
-            serialDict])
+        #serialDict = msgpack.dumps(dict)
+        sendDict = {}
+        sendDict['endPointAddress'] = self.endPointAddress
+        sendDict['contents'] = inDict
+        serialDict = json.dumps(sendDict)
+        self.publisher.send_multipart([str.encode(topic),
+            #str.encode(self.endPointAddress),
+            str.encode(serialDict)])
 
 
 class ZeroMQSubscriber():
@@ -257,13 +262,16 @@ class ZeroMQSubscriber():
         if (len(socks)>0):
             for listItem in self.subscriberList:
                 if listItem['socket'] in socks:
-                    topic, pubAddress, contents = listItem['socket'].recv_multipart()
+                    #topic, pubAddress, contents = listItem['socket'].recv_multipart()
+                    topic, contents = listItem['socket'].recv_multipart()
 
-                    convertedContents = self._convert_keys_to_string(msgpack.loads(contents)) 
+                    #convertedContents = self._convert_keys_to_string(msgpack.loads(contents)) 
+                    convertedContents = self._convert_keys_to_string(json.loads(contents.decode())) 
                     responseList.append({
                         'topic': topic.decode(), 
-                        'pubAddress': pubAddress.decode(), 
-                        'contents': convertedContents
+                        #'pubAddress': pubAddress.decode(),
+                        'pubAddress': convertedContents['endPointAddress'], 
+                        'contents': convertedContents['contents']
                     })                   
 
         return responseList

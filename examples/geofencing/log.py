@@ -13,6 +13,6 @@ import pdb
 import time
 
 logger = loggerNode.Logger(os.path.join(scriptDir,'geofencingExampleConfig.json'), sys.argv[1])
-logger.setLogConfig(os.path.join(scriptDir,'logs','testLog'))
+logger.setLogConfig(os.path.join(scriptDir,'logs','testLog'),fileLogLevel=1, stdoutLogLevel=1)
 logger.run()
 

@@ -41,8 +41,20 @@ class PointInAPolygon():
 
                     logMsg = 'Inside' if (isInside) else 'Outside'
                     self.pointInPolygonNode.log(logLevel=0, message=logMsg)
+                    self.pointInPolygonNode.send('pointInPolygon', isInside)
                 elif(topic == 'newPolygonPoints'):
-                    self.polygon == itemDict['message']
+                    self.pointInPolygonNode.log(logLevel=0, message=itemDict['contents'])
+                    listOfTuples = self.convertDictsToTuples(itemDict['contents'])
+                    #print ('LISTOFTUPLES!!!: ' + str(listOfTuples))
+                    self.polygon = listOfTuples
+
+    @staticmethod
+    def convertDictsToTuples(listOfDicts):
+        listOfTuples = []
+        for dictItem in listOfDicts:
+            listOfTuples.append((dictItem['lat'],dictItem['lng']))
+
+        return listOfTuples
 
     @staticmethod
     def pointInsidePolygon(x,y,poly):
@@ -59,18 +71,18 @@ class PointInAPolygon():
 
         n = len(poly)
         inside =False
-
-        p1x,p1y = poly[0]
-        for i in range(n+1):
-            p2x,p2y = poly[i % n]
-            if y > min(p1y,p2y):
-                if y <= max(p1y,p2y):
-                    if x <= max(p1x,p2x):
-                        if p1y != p2y:
-                            xinters = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
-                        if p1x == p2x or x <= xinters:
-                            inside = not inside
-            p1x,p1y = p2x,p2y
+        if (n != 0):
+            p1x,p1y = poly[0]
+            for i in range(n+1):
+                p2x,p2y = poly[i % n]
+                if y > min(p1y,p2y):
+                    if y <= max(p1y,p2y):
+                        if x <= max(p1x,p2x):
+                            if p1y != p2y:
+                                xinters = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+                            if p1x == p2x or x <= xinters:
+                                inside = not inside
+                p1x,p1y = p2x,p2y
 
         return inside
 

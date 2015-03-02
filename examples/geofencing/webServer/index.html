@@ -28,11 +28,11 @@
 
 		var userMarker = null;
 		socket.on('newGpsPoint', function(newGpsPoint){
-			latlngPoint = new L.Latlng(newGpsPoint.lattitude, newGpsPoint.longitude);
+			var latlngPoint = new L.LatLng(newGpsPoint.latitude, newGpsPoint.longitude);
 			if (userMarker === null){
 				userMarker = new L.Marker(latlngPoint);
 				userMarker.addTo(map);
-				map.setView({center: latlngPoint, zoom: 15});
+				map.setView(latlngPoint, 15);
 			} else {
 				userMarker.setLatLng(latlngPoint);
 			}
@@ -52,7 +52,7 @@
 						timeout: 1000
 					},
 					shapeOptions: {
-						color: '#bada55'
+						color: '#336600'
 					},
 					showArea: true
 				},
@@ -79,22 +79,18 @@
 			drawnItems.addLayer(layer);
 		});
 		map.on('draw:edited', function(e){
-			var type = e.layerType,
-				layer = e.layer;
-
-			if (type === 'polygon') {
+			var layers = e.layers;
+			layers.eachLayer(function (layer) {
 				var latlngs = layer.getLatLngs();
 				notifyServerPolygonPoints(latlngs);
-			}
+    		});			
 		});
 		map.on('draw:deleted', function(e){
-			var type = e.layerType,
-				layer = e.layer;
-				
-			if (type === 'polygon') {
+			var layers = e.layers;
+			layers.eachLayer(function (layer) {
 				var latlngs = [];
 				notifyServerPolygonPoints(latlngs);
-			}
+    		});	
 		});
 		function notifyServerPolygonPoints(latlngs){
 			console.log('new lat longs: ', latlngs);
@@ -102,25 +98,27 @@
 		}
 
 		socket.on('pointInPolygon', function(isPointInPolygon){
-			console.log('new is point in polygon')
+			console.log('new is point in polygon: ', isPointInPolygon);
 			if (isPointInPolygon){
-				//change color of polygon shape to green
-				drawControl.setDrawingOptions({
-					polygon: {
-						shapeOptions: {
-							color: '#336600'
-						}
-					}
-				});
+				console.log('change color to green');
+				//drawControl.setDrawingOptions({
+				//	polygon: {
+				//		shapeOptions: {
+				//			color: '#336600'
+				//		}
+				//	}
+				//});
+				drawControl.options.draw.polygon.shapeOptions.color = '#336600';
 			} else {
-				//change color of polygon shape to red
-				drawControl.setDrawingOptions({
-					polygon: {
-						shapeOptions: {
-							color: '#CC3300'
-						}
-					}
-				});		
+				console.log('change color to red');
+				//drawControl.setDrawingOptions({
+				//	polygon: {
+				//		shapeOptions: {
+				//			color: '#CC3300'
+				//		}
+				//	}
+				//});
+				drawControl.options.draw.polygon.shapeOptions.color = '#CC3300';		
 			}
 		});
 		
