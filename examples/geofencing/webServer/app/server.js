@@ -4,17 +4,21 @@ module.exports = function(){
 	var io = require('socket.io')(http);
 
 	app.get('/', function(req, res){
+	  console.log('sending index file');
 	  res.sendFile(__dirname + '/index.html');
 	});
 
+	app.use(express.static('./'));
+
 	io.on('connection', function(socket){
+	  console.log('connected to client');
 	  socket.on('chat message', function(msg){
 	    io.emit('chat message', msg);
 	  });
 	});
 
-	http.listen(3000, function(){
-	  console.log('listening on *:3000');
+	http.listen(3698, function(){
+	  console.log('listening on *:3698');
 	});	
 
 	// Publisher.  Need to write javascript bindings for processNode.py

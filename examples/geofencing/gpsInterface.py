@@ -11,7 +11,7 @@ import processNode
 class GpsInterface():
 	def __init__(self, processName, fullConfigPath):		
 		gpsInterfaceNode = processNode.ProcessNode(fullConfigPath, processName)
-		inputFilePath = os.path.join(scriptDir, 'inputData/Track on 2015-03-01 at 15-30 MST.gpx')
+		inputFilePath = os.path.join(scriptDir, 'inputData/Track on 2015-02-28 at 19-26 MST.gpx')
 
 		gpx_file = open(inputFilePath, 'r')
 

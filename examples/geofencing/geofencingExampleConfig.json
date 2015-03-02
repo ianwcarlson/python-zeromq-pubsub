@@ -71,7 +71,7 @@
         },
         {
             "processName": "webServer",
-            "processPath": "/usr/local/examples/geofencing/webServer/server.js",
+            "processPath": "/usr/local/examples/geofencing/webServer/main.js",
             "endPoint": "WEB_SERVER_ENDPOINT_ADDR",
             "subscriptions": [
                 {
