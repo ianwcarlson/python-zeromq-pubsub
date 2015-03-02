@@ -4,14 +4,14 @@ var clean = require('gulp-clean');
  
 var srcFiles = [
 	'app/*.js',
-	'clientLibs/leaflet/dist/leaflet.css',
-	'clientLibs/leaflet/src/Leaflet.js',
-	'clientLibs/leaflet-draw/dist/leaflet.draw.js',
-	'clientLibs/leaflet-draw/dist/leaflet.draw.css'
+	'node_modules/leaflet/dist/leaflet.css',
+	'node_modules/leaflet/dist/leaflet.js',
+	'node_modules/leaflet-draw/dist/leaflet.draw.js',
+	'node_modules/leaflet-draw/dist/leaflet.draw.css'
 ];
 
 var srcImages = [
-	'clientLibs/leaflet-draw/dist/images/*'
+	'node_modules/leaflet-draw/dist/images/*'
 ];
 
 gulp.task('lint', function() {
