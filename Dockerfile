@@ -4,6 +4,7 @@ FROM ubuntu:14.04
 # Need a better way to generate keys
 ENV SRC_DIR /usr/local/src
 ENV EXAMPLE_DIR /usr/local/examples/geofencing/webServer
+RUN LEAFLET leaflet-0.7.3
 
 # Base packages
 RUN apt-get update
@@ -23,7 +24,8 @@ RUN wget http://nodejs.org/dist/v0.10.30/node-v0.10.30.tar.gz
 RUN tar -xvf node-v0.10.30.tar.gz
 RUN cd node-v0.10.30 && ./configure && make && make install
 
-#RUN cd $EXAMPLE_DIR/ && npm install 
+RUN cd $EXAMPLE_DIR/ && npm install
+
 #RUN apt-get install -y node
 
 
