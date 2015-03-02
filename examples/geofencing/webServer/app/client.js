@@ -9,7 +9,7 @@ var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 
 var userMarker = null;
 socket.on('newGpsPoint', function(newGpsPoint){
-	latlngPoint = new L.Latlng(newGpsPoint.lattitude, newGpsPoint.longitude)
+	latlngPoint = new L.Latlng(newGpsPoint.lattitude, newGpsPoint.longitude);
 	if (userMarker === null){
 		userMarker = new L.Marker(latlngPoint);
 		userMarker.addTo(map);
@@ -17,7 +17,7 @@ socket.on('newGpsPoint', function(newGpsPoint){
 	} else {
 		userMarker.setLatLng(latlngPoint);
 	}
-})
+});
 
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
