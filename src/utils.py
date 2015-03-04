@@ -31,7 +31,7 @@ def separatePathAndModule(fullPath):
 
     return processList
 
-def importConfigJson(fullPath):
+def importConfigJson(fullPath, pathToSchema=None):
     """
     Reads JSON formatted master configuration file
     :param fullPath: full path of the JSON file to load
@@ -40,11 +40,14 @@ def importConfigJson(fullPath):
     :returns: dictionary of master configuration information
     """
     configDict = {}
-
     file = open(fullPath, 'r')
 
     configDict = json.loads(file.read())
-    validator = Draft3Validator(appNetworkConfigSchema.schema)
+    if (pathToSchema == None):
+        validator = Draft3Validator(appNetworkConfigSchema.schema)
+    else:
+        schema = separatePathAndModule(pathToSchema)
+        validator = Draft3Validator(schema)
     
     # this will raise jsonschema.exceptions.ValidationError exception
     validator.validate(configDict)
