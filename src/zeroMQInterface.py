@@ -11,13 +11,13 @@ scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
 import zmq
 import json
-import msgpack
+#import msgpack
 import importlib
 import pdb
-import utils
+import processNodeUtils
 import logMessageAdapter
 import time
-PUB_BUFF_SIZE = 100000
+PUB_BUFF_SIZE = 10000000
 
 # static functions
 def _extractProcessConfig(processList, processName):
@@ -51,16 +51,31 @@ def _extractConfig(configFilePath, publisherName):
     :type publisherName: str
     :returns: endPointAddress (str), processConfigDict (dict)
     """
-    masterProcessConfig = utils.importConfigJson(configFilePath)
+    masterProcessConfig = processNodeUtils.importConfigJson(configFilePath)
     processConfigDict = _extractProcessConfig(masterProcessConfig['processList'], 
         publisherName)
     endPointIdsList = masterProcessConfig['endPointsIds']
 
     endPointID = processConfigDict['endPoint']
 
-    endPointAddress = utils._convertIDToAddress(endPointID, endPointIdsList)
+    endPointAddress = _convertIDToAddress(endPointID, endPointIdsList)
 
     return endPointAddress, processConfigDict, endPointIdsList
+
+def _convertIDToAddress(endPointID, endPointIdsList):
+    endPointFound = False
+    for item in endPointIdsList:
+        if (item['id'] == endPointID):
+            endPointAddress = item['address']
+            endPointFound = True
+
+    if (not(endPointFound)):
+        print('endPointID: ' + str(endPointID))
+        print('endPointIdsList: ' + str(endPointIdsList))
+        raise ValueError("can't match 'endPoint' in 'endPointIds'")
+        
+
+    return endPointAddress
 
 class ZeroMQPublisher():
     def __init__(self, endPointAddress=None):
@@ -92,7 +107,7 @@ class ZeroMQPublisher():
         self.publisher.bind(endPointAddress)
 
     def importProcessConfig(self, configFilePath, 
-        publisherName=utils.getModuleName(os.path.realpath(__file__))):
+        publisherName=processNodeUtils.getModuleName(os.path.realpath(__file__))):
         """
         Registers publisher settings based off config file
         :param configFilePath: full config file path
@@ -122,7 +137,6 @@ class ZeroMQPublisher():
         :param str topic: string representing the message topic
         :param dictionary dict: data payload input
         """
-
         #serialDict = msgpack.dumps(dict)
         sendDict = {}
         sendDict['endPointAddress'] = self.endPointAddress
@@ -162,7 +176,7 @@ class ZeroMQSubscriber():
         """
         self.logPublisher = publisherRef
 
-    def importProcessConfig(self, configFilePath, subscriberName=utils.getModuleName(os.path.realpath(__file__))):
+    def importProcessConfig(self, configFilePath, subscriberName=processNodeUtils.getModuleName(os.path.realpath(__file__))):
         """
         Registers subscriber settings based off config file
         :param configFilePath: full config file path
@@ -179,7 +193,7 @@ class ZeroMQSubscriber():
 
         if ('subscriptions' in self.processConfigDict):
             for subDict in self.processConfigDict['subscriptions']:
-                self.connectSubscriber(utils._convertIDToAddress(subDict['endPoint'], endPointsIdsList))
+                self.connectSubscriber(_convertIDToAddress(subDict['endPoint'], endPointsIdsList))
                 for topic in subDict['topics']:
                     self.subscribeToTopic(topic)
 
@@ -265,7 +279,7 @@ class ZeroMQSubscriber():
                     #topic, pubAddress, contents = listItem['socket'].recv_multipart()
                     topic, contents = listItem['socket'].recv_multipart()
 
-                    #convertedContents = self._convert_keys_to_string(msgpack.loads(contents)) 
+                    #convertedContents = self._convert_keys_to_string(msgpack.loads(contents))
                     convertedContents = self._convert_keys_to_string(json.loads(contents.decode())) 
                     responseList.append({
                         'topic': topic.decode(), 
