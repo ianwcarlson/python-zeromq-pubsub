@@ -48,7 +48,10 @@ function ZeroMQPublisherClass(endPointAddress){
 
 	}
 	function send(topic, inObject){
-
+		var newMsg = {};
+		newMsg['endPointAddress'] = endPointAddress;
+		newMsg['contents'] = inObject;
+		sockPub.send([topic, JSON.stringify(newMsg)]);		
 	}
 	return {
 		importProcessConfig: importProcessConfig,
