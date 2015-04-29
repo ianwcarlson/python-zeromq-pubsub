@@ -19,22 +19,22 @@ import mockPubSub
 
 class TestZeroMQInterface(unittest.TestCase):
 	def setUp(self):
-		self.configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig5.py')
+		self.configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig5.json')
 		self.publisher = mockPubSub.MockPublisher(self.configPath, 'Pub')
 		self.subscriber = mockPubSub.MockSubscriber(self.configPath, 'Sub')
 
-	def _testSendBasicMessage(self):
-		testModulePath = os.path.join(scriptDir,'testFixtures','pub.py')
+	def testSendBasicMessage(self):
+		testModulePath = os.path.join(scriptDir,'testFixtures','jsProcessNode.js')
 		subprocess.Popen([
 			'node', testModulePath, self.configPath, 'NodeUnderTest'],
 			stdout=True)
 
 		time.sleep(1)
 
-		self.publisher.loadMsgQueue({
+		self.publisher.loadMsgQueue([{
 			'topic': 'toNode',
 			'message': 'untouched'
-		})
+		}])
 		self.publisher.run()
 
 		time.sleep(0.5)

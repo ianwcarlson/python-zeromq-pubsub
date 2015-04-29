@@ -5,17 +5,17 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     
     if (typeof(minLogLevel) === undefined){minLogLevel = 0;}
  
-    publisher = zeroMQInterface.ZeroMQPublisherClass;
+    var publisher = zeroMQInterface.ZeroMQPublisherClass();
     publisher.importProcessConfig(path.resolve(scriptDir,appNetworkConfig), processName);
 
-    subscriber = zeroMQInterface.ZeroMQSubscriber();
+    var subscriber = zeroMQInterface.ZeroMQSubscriberClass();
     // all subscribers are publishers for logging, so a reference to the publisher needs
     // to be passed in
     subscriber.setPublisherRef(publisher);
     subscriber.importProcessConfig(path.resolve(scriptDir,appNetworkConfig), processName);
 
-    minLogLevel = minLogLevel;
-    logAdapter = logMessageAdapter.LogMessageAdapter(processName);
+    // minLogLevel = minLogLevel;
+    var logAdapter = logMessageAdapter.LogMessageAdapter(processName);
 
     // need to wait until zeroMQ socket connections establish, otherwise
     // messages will be initially lost
@@ -29,7 +29,7 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     }
 
     function onReceive(callback){
-        return subscriber.receive();
+        return subscriber.assignCallback();
     }
 
     function log(logLevel, message){

@@ -1,6 +1,7 @@
 var zmq = require('zmq');
 
 function extractProcessConfig(configFileContents, processName){
+	console.log('configFile: ', configFileContents);
 	var processArray = configFileContents.processList;
 	var processConfig = {};
 
@@ -51,9 +52,9 @@ exports.ZeroMQPublisherClass = function(inEndPointAddress){
 	}
 	function importProcessConfig(configFilePath, publisherName){
 		var fileContents = importConfig(configFilePath);
-		var processConfig = extractProcessConfig(publisherName);
+		var processConfig = extractProcessConfig(fileContents, publisherName);
 		var processIDEnum = processConfig.endPoint;
-		var endpoint = convertIDToAddress(processIDEnum);
+		var endpoint = convertIDToAddress(fileContents, processIDEnum);
 		bind(endpoint);
 	}
 	function logPubConnections(){
@@ -71,7 +72,7 @@ exports.ZeroMQPublisherClass = function(inEndPointAddress){
 	};
 };
 
-exports.ZeroMQSubscriber = function(publisher){
+exports.ZeroMQSubscriberClass = function(publisher){
 	var sockSub = zmq.socket('sub');
 	var path = require('path');
 	var subscriptions = [];
@@ -126,5 +127,10 @@ exports.ZeroMQSubscriber = function(publisher){
 			err = false;
 			callback(err, message);	
 		});
+	}
+	return {
+		send: send,
+		importProcessConfig: importProcessConfig,
+		assignCallback: assignCallback
 	}
 };
