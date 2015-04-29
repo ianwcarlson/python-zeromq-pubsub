@@ -1,0 +1,28 @@
+{
+  "name": "python-zeromq-pubsub",
+  "version": "0.0.0",
+  "description": "nodejs processNode layer on top of ZeroMQ",
+  "main": "None",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jasmine-node test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ianwcarlson/python-zeromq-pubsub"
+  },
+  "author": "ianwcarlson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ianwcarlson/python-zeromq-pubsub/issues"
+  },
+  "homepage": "https://github.com/ianwcarlson/python-zeromq-pubsub",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-jshint": "^1.10.0"
+  }
+}

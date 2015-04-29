@@ -199,7 +199,7 @@ class ZeroMQSubscriber():
 
     def connectSubscriber(self, endPointAddress):
         """
-        Method to create subscriber connection to a particular publisher
+        Method to create subscriber connection to aa2 particular publisher
         :param number port: integer representing the port number of the publisher to connect to
         :param str topic: string that is used to filter unwanted messages from publisher
         """

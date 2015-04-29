@@ -13,10 +13,6 @@
             "address" : "tcp://127.0.0.1:5562"
         },
         {
-            "id" : "DB_ENDPOINT_ADDR",
-            "address" : "tcp://127.0.0.1:5563"
-        },
-        {
             "id" : "LOGGER_ENDPOINT_ADDR",
             "address" : "tcp://127.0.0.1:5554"
         }
@@ -77,25 +73,6 @@
                 {
                     "endPoint": "DB_ENDPOINT_ADDR",
                     "topics" : ["proc", "pointInPolygon", "gpsData"]
-                }
-            ]
-        },
-        {
-            "processName": "databaseInterface",
-            "processPath": "/usr/local/examples/geofencing/dbInterface.py",
-            "endPoint": "DB_ENDPOINT_ADDR",
-            "subscriptions": [
-                {
-                    "endPoint": "GPS_IF_ENDPOINT_ADDR",
-                    "topics" : ["proc", "gpsData"]
-                },
-                {
-                    "endPoint": "POINT_IN_POLY_ENDPOINT_ADDR",
-                    "topics" : ["proc", "polygon"]
-                },
-                {
-                    "endPoint": "WEB_SERVER_ENDPOINT_ADDR",
-                    "topics" : ["proc", "gpsHistory"]
                 }
             ]
         }
