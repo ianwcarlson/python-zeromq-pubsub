@@ -1,0 +1,45 @@
+{
+    "endPointsIds" : [
+        {
+            "id" : "PUB_ENDPOINT_ADDR",
+            "address" : "tcp://127.0.0.1:5556"
+        },
+        {
+            "id" : "SUB_ENDPOINT_ADDR",
+            "address" : "tcp://127.0.0.1:5557"
+        },
+        {
+            "id" : "TEST_JS_ENDPOINT_ADDR",
+            "address" : "tcp://127.0.0.1:5558"
+        }
+    ],    
+    "processList" : [
+        {
+            "processName": "Pub",
+            "processPath": "/usr/local/test/testFixtures/pub.py",
+            "endPoint": "PUB_ENDPOINT_ADDR"
+        },
+        {
+            "processName": "NodeUnderTest",
+            "processPath": "/usr/local/test/testFixtures/jsProcessNode.js",
+            "endPoint": "TEST_JS_ENDPOINT_ADDR",
+            "subscriptions": [
+                {
+                    "endPoint": "PUB_ENDPOINT_ADDR",
+                    "topics" : ["toNode"]
+                }
+            ]
+        },
+        {
+            "processName": "Sub",
+            "processPath": "/usr/local/test/testFixtures/sub.py",
+            "endPoint": "SUB_ENDPOINT_ADDR",
+            "subscriptions": [
+                {
+                    "endPoint": "TEST_JS_ENDPOINT_ADDR",
+                    "topics" : ["fromNode"]
+                }
+            ]
+        }
+    ]
+}

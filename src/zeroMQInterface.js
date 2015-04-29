@@ -41,8 +41,9 @@ function constuctSendMsg(inMessage){
 
 exports.ZeroMQPublisherClass = function(inEndPointAddress){
 	var sockPub = zmq.socket('pub');
+	var path = require('path');
 	var endPointAddress = inEndPointAddress;
-	var logAdapter = require('./logMessageAdapter.js')(endPointAddress);
+	var logAdapter = require(path.resolve(__dirname,'logMessageAdapter.js'))(endPointAddress);
 
 	function bind(newEndPointAddress){
 		endPointAddress = newEndPointAddress;
@@ -72,10 +73,11 @@ exports.ZeroMQPublisherClass = function(inEndPointAddress){
 
 exports.ZeroMQSubscriber = function(publisher){
 	var sockSub = zmq.socket('sub');
+	var path = require('path');
 	var subscriptions = [];
 	// Every subscriber is a publisher because of logging
 	var sockPub = publisher;
-	var logAdapter = require('./logMessageAdapter.js')(endPointAddress);
+	var logAdapter = require(path.resolve(__dirname,'logMessageAdapter.js'))(endPointAddress);
 	var endPoint = '';
 
 	function importProcessConfig(configFilePath, subscriberName){
@@ -85,12 +87,13 @@ exports.ZeroMQSubscriber = function(publisher){
 		endpoint = convertIDToAddress(processIDEnum);
 
 		subscriptions = processConfig.subscriptions;
-        if (subscriptions !== undefined){
+        if (typeof subscriptions !== undefined){
             subscriptions.forEach(function(element){
             	sockSub.connect(convertIDToAddress(element.endPoint, endPointsIdsList));
-            	if (element.topics !== undefined){
+            	if (typeof element.topics !== undefined){
             		element.topics.forEach(function(innerTopicElement){
-            			subSub.subscribe(innerTopicElement);
+            			sockSub.subscribe(innerTopicElement);
+            			sockSub.setsockopt('subscribe', innerTopicElement);
             		});
             	}
             });

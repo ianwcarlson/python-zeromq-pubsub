@@ -53,8 +53,5 @@ class TestZeroLoggerMQ(unittest.TestCase):
 		self.assertNotEqual(foundIdx, -1)
 		file.close()
 
-
-
-
 if __name__ == '__main__':
 	unittest.main()
