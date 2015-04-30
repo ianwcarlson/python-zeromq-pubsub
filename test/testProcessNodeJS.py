@@ -9,6 +9,7 @@ import unittest
 import pdb
 import time
 import subprocess
+import signal
 scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
 sys.path.append(os.path.join(scriptDir,'..','src'))
@@ -25,9 +26,8 @@ class TestZeroMQInterface(unittest.TestCase):
 
 	def testSendBasicMessage(self):
 		testModulePath = os.path.join(scriptDir,'testFixtures','jsProcessNode.js')
-		subprocess.Popen([
-			'node', testModulePath, self.configPath, 'NodeUnderTest'],
-			stdout=True)
+		processHandle = subprocess.Popen(['node', testModulePath, self.configPath, 
+			'NodeUnderTest'], stdout=True)
 
 		time.sleep(1)
 
@@ -42,8 +42,9 @@ class TestZeroMQInterface(unittest.TestCase):
 		self.subscriber.runOnce()
 		responseList = self.subscriber.getResponseList()
 
-		print ('responseList: ' + str(responseList))
-
+		self.assertEqual(responseList[0]['topic'], 'fromNode');
+		self.assertEqual(responseList[0]['contents'], 'untouched');
+		os.kill(processHandle.pid, signal.SIGTERM)
 
 if __name__ == '__main__':
 	unittest.main()

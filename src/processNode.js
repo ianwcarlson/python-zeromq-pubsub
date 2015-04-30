@@ -15,7 +15,8 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     subscriber.importProcessConfig(path.resolve(scriptDir,appNetworkConfig), processName);
 
     // minLogLevel = minLogLevel;
-    var logAdapter = logMessageAdapter.LogMessageAdapter(processName);
+    var pubEndpoint = publisher.getPublisherEndpoint();
+    var logAdapter = require(path.resolve(__dirname,'logMessageAdapter.js'))(pubEndpoint);
 
     // need to wait until zeroMQ socket connections establish, otherwise
     // messages will be initially lost
@@ -29,7 +30,7 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     }
 
     function onReceive(callback){
-        return subscriber.assignCallback();
+        return subscriber.assignCallback(callback);
     }
 
     function log(logLevel, message){
@@ -40,6 +41,6 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     return{
         log: log,
         send: send,
-        receive: receive
-    }
+        onReceive: onReceive
+    };
 };

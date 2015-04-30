@@ -281,6 +281,7 @@ class ZeroMQSubscriber():
 
                     #convertedContents = self._convert_keys_to_string(msgpack.loads(contents))
                     convertedContents = self._convert_keys_to_string(json.loads(contents.decode())) 
+                    #print ('convertedContents: ' + str(convertedContents))
                     responseList.append({
                         'topic': topic.decode(), 
                         #'pubAddress': pubAddress.decode(),

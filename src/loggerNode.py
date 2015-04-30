@@ -9,7 +9,7 @@ import os
 import sys
 scriptDir=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptDir)
-import utils
+import processNodeUtils as utils
 import processNode
 import pdb
 import logging
