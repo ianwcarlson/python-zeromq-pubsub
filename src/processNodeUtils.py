@@ -95,3 +95,21 @@ def absImport(moduleName, fullPath):
     loader = importlib.machinery.SourceFileLoader(moduleName, fullPath)
     return loader.load_module()
 
+def getFileExtension(fileName):
+    return os.path.splitext(fileName)[1];
+
+def getInterpreter(fileName):
+    interpreter = ''
+    fileExt = getFileExtension(fileName);
+    print ('fileExt: ' + str(fileExt))
+    if (fileExt == '.js'):
+        interpreter = 'node'
+    elif (fileExt == '.py'):
+        interpreter = 'python'
+    # elif (fileExt == 'exe'):
+    #   interpreter = ''
+
+    return interpreter
+
+
+

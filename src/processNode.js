@@ -14,13 +14,8 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     subscriber.setPublisherRef(publisher);
     subscriber.importProcessConfig(path.resolve(scriptDir,appNetworkConfig), processName);
 
-    // minLogLevel = minLogLevel;
     var pubEndpoint = publisher.getPublisherEndpoint();
     var logAdapter = require(path.resolve(__dirname,'logMessageAdapter.js'))(pubEndpoint);
-
-    // need to wait until zeroMQ socket connections establish, otherwise
-    // messages will be initially lost
-    // time.sleep(1)
 
     publisher.logPubConnections();
     subscriber.logSubConnections();

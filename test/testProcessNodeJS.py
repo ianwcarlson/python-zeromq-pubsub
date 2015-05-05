@@ -26,8 +26,8 @@ class TestZeroMQInterface(unittest.TestCase):
 
 	def testSendBasicMessage(self):
 		testModulePath = os.path.join(scriptDir,'testFixtures','jsProcessNode.js')
-		processHandle = subprocess.Popen(['node', testModulePath, self.configPath, 
-			'NodeUnderTest'], stdout=True)
+		processHandle = subprocess.Popen(['node', testModulePath, 'NodeUnderTest', 
+			self.configPath], stdout=True)
 
 		time.sleep(1)
 

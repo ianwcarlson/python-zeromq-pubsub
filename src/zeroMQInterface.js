@@ -99,7 +99,7 @@ exports.ZeroMQSubscriberClass = function(publisher){
 		err = true;
 		if (callback !== null){
 			err = false;
-			callback(err, message);	
+			callback(err, topic, message);	
 		} else {
 			console.log('Subscriber callback uninitialized');
 		}

@@ -33,7 +33,6 @@ class StatusPrinter():
 class TestZeroMQInterface(unittest.TestCase):
 	def setUp(self):
 		self.processManager = processManager.ProcessManager()
-
 		self.subscriber = zeroMQInterface.ZeroMQSubscriber()
 		self.configPath = os.path.join(scriptDir,'testFixtures','appNetworkConfig2.py')
 

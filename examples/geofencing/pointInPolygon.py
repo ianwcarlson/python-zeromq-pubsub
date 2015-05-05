@@ -49,6 +49,12 @@ class PointInAPolygon():
 
     @staticmethod
     def convertDictsToTuples(listOfDicts):
+        '''
+        Convert to list of tuples
+        :param listOfDicts
+        :type listOfDicts: list of dictionaries
+        :returns: list of dictionaries
+        '''
         listOfTuples = []
         for dictItem in listOfDicts:
             listOfTuples.append((dictItem['lat'],dictItem['lng']))

@@ -80,9 +80,10 @@ class ProcessManager():
         # start processes
         for idx in range(len(self.processInputList)):
             path = os.path.join(scriptDir,self.processInputList[idx]['processPath'])
+            interpreter = processNodeUtils.getInterpreter(path)
             print ('Starting process: ' + str(path) + ' ' + self.processInputList[idx]['processName'])
             self.processHandleList.append(subprocess.Popen([
-                'python', path, self.processInputList[idx]['processName'], self.fullConfigPath], 
+                interpreter, path, self.processInputList[idx]['processName'], self.fullConfigPath], 
                 stdout=True))
 
         # monitor processes to see if they're still alive

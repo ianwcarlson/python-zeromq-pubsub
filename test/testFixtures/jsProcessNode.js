@@ -2,10 +2,10 @@ var zmq = require('zmq');
 var path = require('path');
 var pathToLib = path.resolve(__dirname,'..','..','src','processNode.js');
 
-var pathToNetworkConfig = process.argv[2];
-var nameOfProcess = process.argv[3];
+var nameOfProcess = process.argv[2];
+var pathToNetworkConfig = process.argv[3];
 
 var processNode = require(pathToLib)(pathToNetworkConfig, nameOfProcess, 0);
-processNode.onReceive(function(err, message){
+processNode.onReceive(function(err, topic, message){
 	processNode.send('fromNode', message.contents);
 });
