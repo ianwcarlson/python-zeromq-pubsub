@@ -1,6 +1,6 @@
 module.exports = function(appNetworkConfig, processName, minLogLevel){
     path = require('path');
-    scriptDir = __dirname;
+    scriptDir = process.cwd();
     zeroMQInterface = require(path.join(scriptDir,'zeroMQInterface.js'));
     
     if (typeof(minLogLevel) === undefined){minLogLevel = 0;}
@@ -15,7 +15,7 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     subscriber.importProcessConfig(path.join(scriptDir,appNetworkConfig), processName);
 
     var pubEndpoint = publisher.getPublisherEndpoint();
-    var logAdapter = require(path.join(__dirname,'logMessageAdapter.js'))(pubEndpoint);
+    var logAdapter = require(path.join(scriptDir,'logMessageAdapter.js'))(pubEndpoint);
 
     publisher.logPubConnections();
     subscriber.logSubConnections();
