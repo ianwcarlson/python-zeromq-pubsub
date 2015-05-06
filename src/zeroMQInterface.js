@@ -47,7 +47,7 @@ exports.ZeroMQPublisherClass = function(inEndPointAddress){
 	var sockPub = zmq.socket('pub');
 	var path = require('path');
 	var endPointAddress = inEndPointAddress;
-	var logAdapter = require(path.resolve(__dirname,'logMessageAdapter.js'))(endPointAddress);
+	var logAdapter = require(path.join(__dirname,'logMessageAdapter.js'))(endPointAddress);
 
 	function bind(newEndPointAddress){
 		endPointAddress = newEndPointAddress;
@@ -129,7 +129,7 @@ exports.ZeroMQSubscriberClass = function(publisher){
 	}
 
 	function logSubConnections(){
-		var logAdapter = require(path.resolve(__dirname,'logMessageAdapter.js'))(endPoint);
+		var logAdapter = require(path.join(__dirname,'logMessageAdapter.js'))(endPoint);
 		logMsg = 'Connecting to ';
 		subscriptions.forEach(function(element){
 			logMsg += element.endPoint + ' under the following topics: ';

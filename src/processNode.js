@@ -1,21 +1,21 @@
 module.exports = function(appNetworkConfig, processName, minLogLevel){
     path = require('path');
     scriptDir = __dirname;
-    zeroMQInterface = require(path.resolve(scriptDir,'zeroMQInterface.js'));
+    zeroMQInterface = require(path.join(scriptDir,'zeroMQInterface.js'));
     
     if (typeof(minLogLevel) === undefined){minLogLevel = 0;}
  
     var publisher = zeroMQInterface.ZeroMQPublisherClass();
-    publisher.importProcessConfig(path.resolve(scriptDir,appNetworkConfig), processName);
+    publisher.importProcessConfig(path.join(scriptDir,appNetworkConfig), processName);
 
     var subscriber = zeroMQInterface.ZeroMQSubscriberClass();
     // all subscribers are publishers for logging, so a reference to the publisher needs
     // to be passed in
     subscriber.setPublisherRef(publisher);
-    subscriber.importProcessConfig(path.resolve(scriptDir,appNetworkConfig), processName);
+    subscriber.importProcessConfig(path.join(scriptDir,appNetworkConfig), processName);
 
     var pubEndpoint = publisher.getPublisherEndpoint();
-    var logAdapter = require(path.resolve(__dirname,'logMessageAdapter.js'))(pubEndpoint);
+    var logAdapter = require(path.join(__dirname,'logMessageAdapter.js'))(pubEndpoint);
 
     publisher.logPubConnections();
     subscriber.logSubConnections();
