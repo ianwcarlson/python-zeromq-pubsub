@@ -1,6 +1,6 @@
 var zmq = require('zmq');
 var path = require('path');
-__dirname = path.dirname(module.filename));
+__dirname = path.dirname(module.filename);
 
 function extractProcessConfig(configFileContents, processName){
 

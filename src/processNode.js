@@ -1,6 +1,6 @@
 module.exports = function(appNetworkConfig, processName, minLogLevel){
     path = require('path');
-    scriptDir = path.dirname(module.filename));
+    scriptDir = path.dirname(module.filename);
     zeroMQInterface = require(path.join(scriptDir,'zeroMQInterface.js'));
     
     if (typeof(minLogLevel) === undefined){minLogLevel = 0;}
