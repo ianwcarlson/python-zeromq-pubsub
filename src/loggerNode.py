@@ -56,7 +56,6 @@ class Logger():
         :param logFileName: file name to use for logger
         :type logFileName: str
         """
-        print('Log directory at ' + str(logFileName)) ()
         try:
             os.mkdir(os.path.dirname(logFileName))
             print ('make dir at ' + logFileName)
