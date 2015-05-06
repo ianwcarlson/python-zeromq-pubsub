@@ -101,7 +101,6 @@ def getFileExtension(fileName):
 def getInterpreter(fileName):
     interpreter = ''
     fileExt = getFileExtension(fileName);
-    print ('fileExt: ' + str(fileExt))
     if (fileExt == '.js'):
         interpreter = 'node'
     elif (fileExt == '.py'):
