@@ -46,6 +46,7 @@ class Logger():
                     logString
                     if (logLevel >= self.fileLogLevel):
                         self.logFile.write(fullLogString + '\n')
+                        self.logFile.flush()
                     if (logLevel >= self.stdoutLogLevel):
                         print(fullLogString)
 

@@ -14,8 +14,8 @@ module.exports = function(appNetworkConfig, processName, minLogLevel){
     subscriber.setPublisherRef(publisher);
     subscriber.importProcessConfig(appNetworkConfig, processName);
 
-    var pubEndpoint = publisher.getPublisherEndpoint();
-    var logAdapter = require(path.join(scriptDir,'logMessageAdapter.js'))(pubEndpoint);
+    var pubID = publisher.getPublisherID();
+    var logAdapter = require(path.join(scriptDir,'logMessageAdapter.js'))(pubID);
 
     publisher.logPubConnections();
     subscriber.logSubConnections();

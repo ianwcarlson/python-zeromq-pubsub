@@ -37,8 +37,9 @@ function importConfig(configFilePath){
 	fileContents = fs.readFileSync(configFilePath);
 	return JSON.parse(fileContents);
 }
-function constructSendMsg(endPointAddress, inObject){
+function constructSendMsg(pubID, endPointAddress, inObject){
 	var newMsg = {
+		'pubID': pubID,
 		'endPointAddress': endPointAddress,
 		'contents': inObject
 	};
@@ -49,6 +50,7 @@ exports.ZeroMQPublisherClass = function(inEndPointAddress){
 	var sockPub = zmq.socket('pub');
 	var path = require('path');
 	var endPointAddress = inEndPointAddress;
+	var processName = '';
 	var logAdapter = require(path.join(__dirname,'logMessageAdapter.js'))(endPointAddress);
 
 	function bind(newEndPointAddress){
@@ -59,6 +61,7 @@ exports.ZeroMQPublisherClass = function(inEndPointAddress){
 		var fileContents = importConfig(configFilePath);
 		var processConfig = extractProcessConfig(fileContents, publisherName);
 		var processIDEnum = processConfig.endPoint;
+		processName = processConfig.processName;
 		var endpoint = convertIDToAddress(fileContents, processIDEnum);
 		bind(endpoint);
 	}
@@ -69,16 +72,20 @@ exports.ZeroMQPublisherClass = function(inEndPointAddress){
         send('log', logAdapter.genLogMessage(logLevel, logMsg));
 	}
 	function send(topic, inObject){
-		var newMsg = constructSendMsg(endPointAddress, inObject);
+		var newMsg = constructSendMsg(processName, endPointAddress, inObject);
 		sockPub.send([topic, newMsg]);		
 	}
 	function getPublisherEndpoint(){
 		return endPointAddress;
 	}
+	function getPublisherID(){
+		return processName;
+	}
 	return {
 		importProcessConfig: importProcessConfig,
 		logPubConnections: logPubConnections,
 		send: send,
+		getPublisherID: getPublisherID,
 		getPublisherEndpoint: getPublisherEndpoint
 	};
 };
@@ -90,6 +97,7 @@ exports.ZeroMQSubscriberClass = function(publisher){
 	// Every subscriber is a publisher because of logging
 	var sockPub = publisher;
 	var endPoint = '';
+	var processName = '';
 	var callback = null;
 
 	sockSub.on('message', function(topic, message){
@@ -111,6 +119,7 @@ exports.ZeroMQSubscriberClass = function(publisher){
 		var fileContents = importConfig(configFilePath);
 		var processConfig = extractProcessConfig(fileContents, subscriberName);
 		var processIDEnum = processConfig.endPoint;
+		processName = processConfig.processName;
 		endpoint = convertIDToAddress(fileContents, processIDEnum);
 
 		subscriptions = processConfig.subscriptions;
@@ -144,7 +153,7 @@ exports.ZeroMQSubscriberClass = function(publisher){
 	}
 
 	function send(topic, inObject){
-		var newMsg = constructSendMsg(endPoint, inObject);
+		var newMsg = constructSendMsg(processName, endPoint, inObject);
 		sockPub.send([topic, endPoint, newMsg]);		
 	}
 
