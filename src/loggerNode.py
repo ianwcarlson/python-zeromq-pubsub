@@ -49,6 +49,8 @@ class Logger():
                     if (logLevel >= self.stdoutLogLevel):
                         print(fullLogString)
 
+            time.sleep(0.1)
+
     def setLogConfig(self, logFileName=os.path.join('logs',time.strftime('%d_%b_%Y_%H:%M:%S_LT', time.localtime())), 
         fileLogLevel=0, stdoutLogLevel=0):
         """
