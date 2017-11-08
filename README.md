@@ -1,4 +1,4 @@
-# python-zeromq-pubsub
+# [Unsupported] python-zeromq-pubsub
 Microservice oriented starter project using ZeroMQ sockets and publish/subscribe pattern for distributed applications.  
 
 The basic idea is to simplify the ZeroMQ interface by wrapping the publish/subscribe details and providing a standardize message format as it arrives to the subscriber.  The internal transport can be defined via configuration file fed to the process manager.  The serialized data protocol is currently [MessagePack](http://msgpack.org/) not JSON, since it's leaner.
